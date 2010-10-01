@@ -6,9 +6,9 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.RectF;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
-import android.view.View;
 import android.widget.ImageView;
 
 public class RetroTimerView extends ImageView {
@@ -17,10 +17,21 @@ public class RetroTimerView extends ImageView {
 	
 	private GestureDetector mGestures;
 	
+	private RetroTimerListener mListener;
+	
+	private final long mTimerMaxVal = (59*60 + 59)*1000;
 	private final String mCompleteScale = 
 		"0....5....10....15....20....25....30....35....40....45....50....55....";
 	private Paint mScalePaint;
+	
+	private long mTimerVal = 0;
+	private long mTimerTempVal = 0;
 
+	public interface RetroTimerListener {
+		abstract void onTimerTempValue(long millis);
+		abstract void onTimerSetValue(long millis);
+	}
+	
 	public RetroTimerView (Context context) {
 		super(context);
 		setImageResource(R.drawable.timer);
@@ -34,41 +45,84 @@ public class RetroTimerView extends ImageView {
 		mScalePaint.setAntiAlias(true);
 	}
 
+    public void setRetroTimerListener(RetroTimerListener listener) {
+        mListener = listener;
+    }
+    
+    public void setTimeLeft(long millis) {
+    	mTimerVal = millis;
+    }
+
 	private void onTurn(float dx) {
+		int h = this.getHeight();
+		int w = this.getWidth();
+		Log.d(TAG, "onTurn(dx=" + dx + ")");
+		Log.d(TAG, "getHeight()=" + h + ", getWidth()=" + w);
+
+		Log.d(TAG, "change in mins=" + ((float) dx / w) * 30*60);
+		mTimerTempVal = mTimerVal + (long) (((float) dx / w) * 30*60*1000);
 		
+		if (mTimerTempVal < 0) {
+			mTimerTempVal = 0;
+		} else if (mTimerTempVal > mTimerMaxVal) {
+			mTimerTempVal = mTimerMaxVal;
+		}
+
+		invalidate(); // redraw the egg
+
+		mListener.onTimerTempValue(mTimerTempVal);
 	}
 	
+	private void onSet() {
+		setTimeLeft(mTimerTempVal);
+
+		mListener.onTimerSetValue(mTimerVal);
+		
+		invalidate(); // redraw the egg
+	}
+		
 	@Override
 	protected void onDraw(Canvas canvas) {
 		super.onDraw(canvas);
 
 		Path mScalePath = new Path();
 
-		float middle = this.getHeight()/2f;
-		float sidePadding = 5f;
-		float ovalHeight = 80/2f;
+		float middle = this.getHeight()/2f-10;
+		float sidePadding = 20f;
+		float ovalHeight = 90/2f;
 		
 		mScalePath.moveTo(sidePadding, middle);
 		mScalePath.addArc(new RectF(sidePadding,
 				middle-ovalHeight,
 				this.getWidth()-sidePadding,
 				middle+ovalHeight),
-				90, -90);
+				150, -120);
 
-		canvas.drawTextOnPath(mCompleteScale, mScalePath, 0, 0, mScalePaint);
+		canvas.drawTextOnPath(Long.toString(mTimerTempVal / (60*1000)),
+				mScalePath, 0, 0, mScalePaint);
 	}
 	
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        return mGestures.onTouchEvent(event);
+    	boolean retVal = mGestures.onTouchEvent(event);
+    	
+    	int action = event.getAction();
+        if (action == MotionEvent.ACTION_UP ||
+        		action == MotionEvent.ACTION_CANCEL) {
+            // Helper method to detect when scrolling is finished
+            onSet();
+            retVal = true;
+        }
+
+        return retVal;
     }
 
 	private class TimerGestureListener 
 			extends GestureDetector.SimpleOnGestureListener {
 
-		private View mView;
+		private RetroTimerView mView;
 		
-		public TimerGestureListener (View view) {
+		public TimerGestureListener (RetroTimerView view) {
 			this.mView = view;
 		}
 		
@@ -81,14 +135,15 @@ public class RetroTimerView extends ImageView {
 		@Override
 		public boolean onFling(MotionEvent e1, MotionEvent e2,
 				final float velocityX, final float velocityY) {
-//			Log.v(TAG, "onFling");
+			Log.d(TAG, "onFling");
 			return true;
 		}
 
 		@Override
         public boolean onScroll(MotionEvent e1, MotionEvent e2,
                 float distanceX, float distanceY) {
-//            Log.v(TAG, "onScroll");
+            Log.d(TAG, "onScroll");
+			mView.onTurn(e2.getX() - e1.getX());
             return true;
 		}
 	}
