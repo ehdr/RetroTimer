@@ -12,26 +12,28 @@ import android.view.MotionEvent;
 import android.widget.ImageView;
 
 public class RetroTimerView extends ImageView {
-	
+
+	public static final long TIMER_MAX_MILLIS = (59*60 + 59)*1000;
+
 	private static final String TAG = "RetroTimerView";
 	
 	private GestureDetector mGestures;
-	
 	private RetroTimerListener mListener;
-	
-	private final long mTimerMaxVal = (59*60 + 59)*1000;
+
 	private final String mCompleteScale = 
 		"0....5....10....15....20....25....30....35....40....45....50....55....";
 	private Paint mScalePaint;
+
+	private long mMillisLeft = 0;
 	
-	private long mTimerVal = 0;
-	private long mTimerTempVal = 0;
+	private boolean mBeingChanged = false;
+	private long mMillisLeftBefore = 0;
 
 	public interface RetroTimerListener {
 		abstract void onTimerTempValue(long millis);
 		abstract void onTimerSetValue(long millis);
 	}
-	
+
 	public RetroTimerView (Context context) {
 		super(context);
 		setImageResource(R.drawable.timer);
@@ -49,38 +51,43 @@ public class RetroTimerView extends ImageView {
         mListener = listener;
     }
     
-    public void setTimeLeft(long millis) {
-    	mTimerVal = millis;
+    public void setMillisLeft(long millis) {
+    	mMillisLeft = millis;
+
+		invalidate(); // redraw the egg
     }
 
 	private void onTurn(float dx) {
 		int h = this.getHeight();
 		int w = this.getWidth();
-		Log.d(TAG, "onTurn(dx=" + dx + ")");
+		
+		Log.d(TAG, "onTurn(dx=" + dx + "), mBeingChanged=" + mBeingChanged);
 		Log.d(TAG, "getHeight()=" + h + ", getWidth()=" + w);
 
-		Log.d(TAG, "change in mins=" + ((float) dx / w) * 30*60);
-		mTimerTempVal = mTimerVal + (long) (((float) dx / w) * 30*60*1000);
-		
-		if (mTimerTempVal < 0) {
-			mTimerTempVal = 0;
-		} else if (mTimerTempVal > mTimerMaxVal) {
-			mTimerTempVal = mTimerMaxVal;
+		if (mBeingChanged == false) {
+			mMillisLeftBefore = mMillisLeft;
+			mBeingChanged = true;
 		}
 
-		invalidate(); // redraw the egg
+		mMillisLeft = mMillisLeftBefore + (long) (((float) dx / w) * 30*60*1000);
 
-		mListener.onTimerTempValue(mTimerTempVal);
+		if (mMillisLeft <= 0) {
+    		mMillisLeft = 0;
+    	} else if (mMillisLeft > TIMER_MAX_MILLIS) {
+    		mMillisLeft = TIMER_MAX_MILLIS;
+    	}
+		
+		Log.d(TAG, "change in mins=" + ((mMillisLeftBefore - mMillisLeft) / 1000));
+
+		mListener.onTimerTempValue(mMillisLeft);
 	}
 	
 	private void onSet() {
-		setTimeLeft(mTimerTempVal);
-
-		mListener.onTimerSetValue(mTimerVal);
-		
-		invalidate(); // redraw the egg
+		mListener.onTimerSetValue(mMillisLeft);
+		mBeingChanged = false;
+		mMillisLeftBefore = 0;
 	}
-		
+
 	@Override
 	protected void onDraw(Canvas canvas) {
 		super.onDraw(canvas);
@@ -98,7 +105,7 @@ public class RetroTimerView extends ImageView {
 				middle+ovalHeight),
 				150, -120);
 
-		canvas.drawTextOnPath(Long.toString(mTimerTempVal / (60*1000)),
+		canvas.drawTextOnPath(Long.toString(mMillisLeft / (60*1000)),
 				mScalePath, 0, 0, mScalePaint);
 	}
 	
@@ -136,6 +143,7 @@ public class RetroTimerView extends ImageView {
 		public boolean onFling(MotionEvent e1, MotionEvent e2,
 				final float velocityX, final float velocityY) {
 			Log.d(TAG, "onFling");
+//			TODO: call callback for flinging
 			return true;
 		}
 
