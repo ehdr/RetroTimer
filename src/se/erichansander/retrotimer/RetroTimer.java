@@ -1,120 +1,31 @@
 package se.erichansander.retrotimer;
 
-import se.erichansander.retrotimer.RetroTimerView.RetroTimerListener;
-import android.app.Activity;
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.os.Bundle;
-import android.os.Handler;
-import android.util.Log;
-import android.widget.FrameLayout;
+//TODO: fix behaviour when countdown reaches zero before alarm
+//TODO: handle escaping from the TimerAlert activity (by home button, back button, etc)
+//TODO: check what happens if e.g. a alarm clock alarm triggers while the timer alerts
+//TODO: check what happens if timer alerts while alarm clock triggers
 
-public class RetroTimer extends Activity implements RetroTimerListener {
+public class RetroTimer {
 	
-	private static final String TAG = "RetroTimer";
+	public static final String ALARM_TRIGGER_ACTION =
+		"se.erichansander.retrotimer.ALARM_TRIGGER";
+	public static final String ALARM_PLAY_ACTION =
+		"se.erichansander.retrotimer.ALARM_PLAY";
+	public static final String ALARM_KILLED_ACTION =
+		"se.erichansander.retrotimer.ALARM_KILLED";
+
+
+	// This string is used when passing the alarm time through an intent
+	public static final String ALARM_TIME_EXTRA = "intent.extra.alarmtime";
 	
-	private RetroTimerView mTimer;
-	
-	private boolean mAlarmSet = false;
-	private long mAlarmTime = 0;
 
-	private final Handler mHandler = new Handler();
-    private final BroadcastReceiver mIntentReceiver = new BroadcastReceiver() {
-    	@Override
-    	public void onReceive(Context context, Intent intent) {
-    		// Post a runnable to avoid blocking the broadcast
-    		mHandler.post(new Runnable() {
-    			public void run() {
-//  				TODO: need special handling of _TIME_CHANGED and _TIMEZONE_CHANGED eventually
-    		    	mTimer.setMillisLeft(calcTimeLeft());
-    			}
-    		});
-    	}
-    };
+	// true when an alarm is set
+	public static final String PREF_ALARM_SET = "prefs.alarm_set";
+	// Absolute time when alarm should go off, in millis since epoch 
+	public static final String PREF_ALARM_TIME = "prefs.alarm_time";
+	// true if alert should not play audio
+	public static final String PREF_SILENT = "prefs.silent";
+	// true if alert should vibrate device
+	public static final String PREF_VIBRATE = "prefs.vibrate";
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.main);
-        
-        FrameLayout frame = (FrameLayout) findViewById(R.id.timer_holder);
-    	this.mTimer = new RetroTimerView(this);
-    	this.mTimer.setRetroTimerListener(this);
-    	frame.addView(this.mTimer);
-    }
-    
-	@Override
-    protected void onResume() {
-        super.onResume();
-
-        /* install intent receiver for the events we need: */
-        IntentFilter filter = new IntentFilter();
-        filter.addAction(Intent.ACTION_TIME_TICK); // the passage of time
-//      TODO: are these two needed even when not running?
-        filter.addAction(Intent.ACTION_TIME_CHANGED); // new system time set
-        filter.addAction(Intent.ACTION_TIMEZONE_CHANGED); // system timezone changed
-        registerReceiver(mIntentReceiver, filter);
-	}
-	
-	@Override
-	protected void onPause() {
-		super.onPause();
-
-		/* stop updating clock when we are no longer running */
-		unregisterReceiver(mIntentReceiver);
-	}
-
-	public void onTimerTempValue(long millisLeft) {
-    	Log.d(TAG, "onTimerTempValue(millisLeft=" + millisLeft + ")");
-
-    	if (mAlarmSet) cancelAlarm();
-
-    	if (millisLeft <= 0) {
-    		millisLeft = 0;
-//    		TODO: vibrate
-		}
-
-    	mTimer.setMillisLeft(millisLeft);
-    }
-
-
-    public void onTimerSetValue (long millisLeft) {
-    	Log.d(TAG, "onTimerSetValue(millisLeft=" + millisLeft + ")");
-
-//    	TODO: require millisLeft > someSmallThreshold?
-    	if (millisLeft > 0) {
-//    		TODO: set new alarm
-    		mAlarmTime = System.currentTimeMillis() + millisLeft;
-        	mAlarmSet = true;
-    	} else {
-    		cancelAlarm();
-    	}
-
-    	mTimer.setMillisLeft(calcTimeLeft());
-    }
-    
-    private long calcTimeLeft() {
-    	if (mAlarmSet) {
-//  		TODO: assert mAlarmTime > curr time?
-    		return mAlarmTime - System.currentTimeMillis();
-    	} else {
-    		return 0;
-    	}
-    }
-
-    private void soundAlarm() {
-//    	TODO: sound alarm
-//    	TODO: clean up needed?
-
-    	mAlarmSet = false;
-    	mAlarmTime = 0;
-    }
-
-    private void cancelAlarm() {
-		mAlarmSet = false;
-//		TODO: cancel alarm
-		mAlarmTime = 0;
-	}
 }
