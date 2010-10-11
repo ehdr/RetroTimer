@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.RectF;
+import android.graphics.Typeface;
 import android.widget.ImageView;
 
 public class TimerView extends ImageView {
@@ -28,6 +29,7 @@ public class TimerView extends ImageView {
 		mScalePaint = new Paint();
 //		TODO: fixed width font
 		mScalePaint.setColor(Color.RED);
+		mScalePaint.setTypeface(Typeface.MONOSPACE);
 		mScalePaint.setTextSize(32);
 		mScalePaint.setAntiAlias(true);
 	}
