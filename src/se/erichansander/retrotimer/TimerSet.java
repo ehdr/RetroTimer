@@ -33,17 +33,35 @@ public class TimerSet extends Activity implements TimerSetListener {
 
 	// Handler for updating the TimerView with time remaining
 	private final Handler mHandler = new Handler();
-    private final BroadcastReceiver mTickReceiver = new BroadcastReceiver() {
+    private final BroadcastReceiver mTickReceiver = new BroadcastReceiver() {    	
     	@Override
     	public void onReceive(Context context, Intent intent) {
+    		/* This runs on the minute, but we delay the actual update
+    		 * to the same offset from the whole minute as the alarm time
+    		 */
+    		long minOffset = 0;
+        	if (mPrefs.getBoolean(RetroTimer.PREF_ALARM_SET, false)) {
+        		minOffset = 
+        				mPrefs.getLong(RetroTimer.PREF_ALARM_TIME, 0) % 60000
+        				- 1000;
+        		if (minOffset < 0) {
+        			minOffset += 60000;
+        			
+        			// Update right away as well, to get the start value right
+                	mHandler.post(new Runnable() {
+                		public void run() {
+                			mTimer.setMillisLeft(calcTimeLeft());
+                		}
+                	});
+        		}
+        	}
+        	
     		// Post a runnable to avoid blocking the broadcast
-    		mHandler.post(new Runnable() {
+        	mHandler.postDelayed(new Runnable() {
     			public void run() {
-//  				TODO: need special handling of _TIME_CHANGED and 
-//    					  _TIMEZONE_CHANGED eventually
     		    	mTimer.setMillisLeft(calcTimeLeft());
     			}
-    		});
+        	}, minOffset);
     	}
     };
 
@@ -68,6 +86,8 @@ public class TimerSet extends Activity implements TimerSetListener {
         /* install intent receiver for the events we need to update timer view */
         IntentFilter filter = new IntentFilter();
         filter.addAction(Intent.ACTION_TIME_TICK); // the passage of time
+//      TODO: need special handling of _TIME_CHANGED and 
+//		  _TIMEZONE_CHANGED eventually
         filter.addAction(Intent.ACTION_TIME_CHANGED); // new system time set
         filter.addAction(Intent.ACTION_TIMEZONE_CHANGED); // system timezone changed
         registerReceiver(mTickReceiver, filter);
