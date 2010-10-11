@@ -10,6 +10,8 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.FrameLayout;
 
 public class TimerAlert extends Activity implements TimerAlertListener {
@@ -29,8 +31,17 @@ public class TimerAlert extends Activity implements TimerAlertListener {
     @Override
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
-        setContentView(R.layout.main);
         
+        final Window win = getWindow();
+        win.addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
+                | WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
+        // Turn on the screen
+        win.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
+        		| WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
+        		| WindowManager.LayoutParams.FLAG_ALLOW_LOCK_WHILE_SCREEN_ON);
+
+        setContentView(R.layout.main);
+
         FrameLayout frame = (FrameLayout) findViewById(R.id.timer_holder);
     	mTimer = new TimerAlertView(this);
     	mTimer.setTimerAlertListener(this);
