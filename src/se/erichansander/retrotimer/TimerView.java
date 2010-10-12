@@ -28,7 +28,7 @@ public class TimerView extends ImageView {
 		// set the color and font size
 		mScalePaint = new Paint();
 //		TODO: fixed width font
-		mScalePaint.setColor(Color.RED);
+		mScalePaint.setColor(Color.rgb(230, 26, 96));
 		mScalePaint.setTypeface(Typeface.MONOSPACE);
 		mScalePaint.setTextSize(32);
 		mScalePaint.setAntiAlias(true);
