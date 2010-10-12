@@ -32,7 +32,7 @@ import android.util.Log;
 /**
  * Glue class: Receives intents:
  * ALARM_TRIGGER_ACTION
- * ALARM_KILLED_ACTION
+ * ALARM_SILENCE_ACTION
  */
 public class AlarmReceiver extends BroadcastReceiver {
 
@@ -51,13 +51,16 @@ public class AlarmReceiver extends BroadcastReceiver {
     	long alarmTime =
     		intent.getLongExtra(RetroTimer.ALARM_TIME_EXTRA, 0);
 
-    	if (RetroTimer.ALARM_KILLED_ACTION.equals(intent.getAction())) {
+    	if (Intent.ACTION_BOOT_COMPLETED.equals(intent.getAction())) {
+    		RetroTimer.initAlarm(context);
+    		return;
+    	} else if (RetroTimer.ALARM_SILENCE_ACTION.equals(intent.getAction())) {
             // The alarm has been killed, update the notification
             updateNotification(context, alarmTime);
             return;
         }
     	
-    	// Not ALARM_KILLED_ACTION, so from now on it's ALARM_TRIGGER_ACTION
+    	// Not ALARM_SILENCE_ACTION, so from now on it's ALARM_TRIGGER_ACTION
 
         // Intentionally verbose: always log the alarm time to provide useful
         // information in bug reports.

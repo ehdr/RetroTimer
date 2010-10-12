@@ -7,12 +7,17 @@
 	<uses-sdk android:minSdkVersion="4"
 			  android:targetSdkVersion="8" />
 
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.WAKE_LOCK"/>
     <uses-permission android:name="android.permission.VIBRATE"/>
+    <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
+<!--    <uses-permission android:name="android.permission.DEVICE_POWER" />-->
+<!--    <uses-permission android:name="android.permission.WRITE_SETTINGS" />-->
 
     <application android:label="@string/app_name"
-				 android:icon="@drawable/icon" 
+				 android:icon="@drawable/icon"
+				 android:name="RetroTimer" 
     			 android:debuggable="true">
  
         <activity android:name="TimerSet"
@@ -30,9 +35,16 @@
         </activity>
 
         <receiver android:name="AlarmReceiver">
+        	<!-- RetroTimer specific intents -->
             <intent-filter>
                <action android:name="se.erichansander.retrotimer.ALARM_TRIGGER" />
-               <action android:name="se.erichansander.retrotimer.ALARM_KILLED" />
+               <action android:name="se.erichansander.retrotimer.ALARM_SILENCE" />
+               <action android:name="se.erichansander.retrotimer.ALARM_DISMISS" />
+            </intent-filter>
+
+            <!-- Android system intents -->
+            <intent-filter>
+               <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
 

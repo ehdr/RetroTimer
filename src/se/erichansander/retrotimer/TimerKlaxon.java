@@ -149,7 +149,7 @@ public class TimerKlaxon extends Service {
     }
 
     private void sendKillBroadcast(long alarmTime) {
-        Intent intent = new Intent(RetroTimer.ALARM_KILLED_ACTION);
+        Intent intent = new Intent(RetroTimer.ALARM_SILENCE_ACTION);
         intent.putExtra(RetroTimer.ALARM_TIME_EXTRA, alarmTime);
         sendBroadcast(intent);
     }

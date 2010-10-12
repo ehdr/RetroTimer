@@ -2,8 +2,6 @@ package se.erichansander.retrotimer;
 
 import se.erichansander.retrotimer.TimerSetView.TimerSetListener;
 import android.app.Activity;
-import android.app.AlarmManager;
-import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -40,6 +38,7 @@ public class TimerSet extends Activity implements TimerSetListener {
     		 * to the same offset from the whole minute as the alarm time
     		 */
     		long minOffset = 0;
+
         	if (mPrefs.getBoolean(RetroTimer.PREF_ALARM_SET, false)) {
         		minOffset = 
         				mPrefs.getLong(RetroTimer.PREF_ALARM_TIME, 0) % 60000
@@ -50,7 +49,7 @@ public class TimerSet extends Activity implements TimerSetListener {
         			// Update right away as well, to get the start value right
                 	mHandler.post(new Runnable() {
                 		public void run() {
-                			mTimer.setMillisLeft(calcTimeLeft());
+                			updateTimeLeft();
                 		}
                 	});
         		}
@@ -59,19 +58,31 @@ public class TimerSet extends Activity implements TimerSetListener {
     		// Post a runnable to avoid blocking the broadcast
         	mHandler.postDelayed(new Runnable() {
     			public void run() {
-    		    	mTimer.setMillisLeft(calcTimeLeft());
+    		    	updateTimeLeft();
     			}
         	}, minOffset);
     	}
     };
 
+	private void updateTimeLeft() {
+		long millisLeft = RetroTimer.getMillisLeftToAlarm(this);
+		updateTimeLeft(millisLeft);
+	}
+
+	private void updateTimeLeft(long millisLeft) {
+		mTimer.setMillisLeft(millisLeft);
+	}
+
     @Override
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
-        setContentView(R.layout.main);
 
         mVibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
         mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+
+        RetroTimer.initAlarm(this);
+
+        setContentView(R.layout.main);
 
         FrameLayout frame = (FrameLayout) findViewById(R.id.timer_holder);
     	mTimer = new TimerSetView(this);
@@ -92,10 +103,10 @@ public class TimerSet extends Activity implements TimerSetListener {
         filter.addAction(Intent.ACTION_TIMEZONE_CHANGED); // system timezone changed
         registerReceiver(mTickReceiver, filter);
 
-    	mTimer.setMillisLeft(calcTimeLeft());
-    	if (calcTimeLeft() == 0) {
+        if (RetroTimer.getMillisLeftToAlarm(this) <= 0) {
     		mTempAtZero = true;
     	}
+        updateTimeLeft();
 	}
 
 	@Override
@@ -110,7 +121,7 @@ public class TimerSet extends Activity implements TimerSetListener {
 //    	Log.d(DEBUG_TAG, "onTimerTempValue(millisLeft=" + millisLeft + ")");
 
     	if (mPrefs.getBoolean(RetroTimer.PREF_ALARM_SET, true)) {
-    		cancelAlarm();
+    		RetroTimer.cancelAlarm(this);
     	}
 
     	if (millisLeft <= 0) {
@@ -125,7 +136,7 @@ public class TimerSet extends Activity implements TimerSetListener {
 			mTempAtZero = false;
 		}
 
-    	mTimer.setMillisLeft(millisLeft);
+    	updateTimeLeft(millisLeft);
     }
 
 
@@ -133,57 +144,11 @@ public class TimerSet extends Activity implements TimerSetListener {
     	Log.d(DEBUG_TAG, "onTimerSetValue(millisLeft=" + millisLeft + ")");
 
     	if (millisLeft > 0) {
-    		setAlarm(millisLeft);
+    		RetroTimer.setAlarmDelayed(this, millisLeft);
     	} else {
-    		cancelAlarm();
+    		RetroTimer.cancelAlarm(this);
     	}
 
-    	mTimer.setMillisLeft(calcTimeLeft());
-    }
-    
-    private long calcTimeLeft() {
-    	if (mPrefs.getBoolean(RetroTimer.PREF_ALARM_SET, false)) {
-//  		TODO: assert mAlarmTime > curr time?
-    		return mPrefs.getLong(RetroTimer.PREF_ALARM_TIME, 0)
-    				- System.currentTimeMillis();
-    	} else {
-    		return 0;
-    	}
-    }
-    
-    private void setAlarm(long millisLeft) {
-    	SharedPreferences.Editor editor = mPrefs.edit();
-    	AlarmManager am = (AlarmManager)
-        	getSystemService(Context.ALARM_SERVICE);
-        
-    	long alarmTime = System.currentTimeMillis() + millisLeft;
-
-        Intent intent = new Intent(RetroTimer.ALARM_TRIGGER_ACTION);
-        intent.putExtra(RetroTimer.ALARM_TIME_EXTRA, alarmTime);
-        PendingIntent sender = PendingIntent.getBroadcast(
-                this, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
-
-        editor.putLong(RetroTimer.PREF_ALARM_TIME, alarmTime);
-        am.set(AlarmManager.RTC_WAKEUP, alarmTime, sender);
-
-//      TODO: show timer status in status bar
-
-    	editor.putBoolean(RetroTimer.PREF_ALARM_SET, true);
-    	editor.commit();
-    }
-
-    private void cancelAlarm() {
-    	SharedPreferences.Editor editor = mPrefs.edit();
-
-		AlarmManager am =
-				(AlarmManager) getSystemService(Context.ALARM_SERVICE);
-		PendingIntent sender = PendingIntent.getBroadcast(
-				this, 0, new Intent(RetroTimer.ALARM_TRIGGER_ACTION),
-				PendingIntent.FLAG_CANCEL_CURRENT);
-		am.cancel(sender);
-
-        editor.putLong(RetroTimer.PREF_ALARM_TIME, 0);
-		editor.putBoolean(RetroTimer.PREF_ALARM_SET, false);
-    	editor.commit();
+    	updateTimeLeft();
     }
 }

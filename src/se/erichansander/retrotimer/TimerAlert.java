@@ -20,7 +20,7 @@ public class TimerAlert extends Activity implements TimerAlertListener {
 
 	private TimerAlertView mTimer;
 
-	// Received to handle ALARM_KILLED_ACTION
+	// Received to handle ALARM_SILENCE_ACTION
     private BroadcastReceiver mReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -48,7 +48,7 @@ public class TimerAlert extends Activity implements TimerAlertListener {
     	frame.addView(this.mTimer);
 
         IntentFilter filter = 
-        		new IntentFilter(RetroTimer.ALARM_KILLED_ACTION);
+        		new IntentFilter(RetroTimer.ALARM_SILENCE_ACTION);
         registerReceiver(mReceiver, filter);
     }
     
@@ -57,7 +57,7 @@ public class TimerAlert extends Activity implements TimerAlertListener {
     	super.onResume();
     	mTimer.setMillisLeft(0);
     }
-    
+
     @Override
     public void onDestroy() {
         super.onDestroy();
@@ -108,6 +108,7 @@ public class TimerAlert extends Activity implements TimerAlertListener {
             // kill the Klaxon
             stopService(new Intent(this, TimerKlaxon.class));
         }
+
         finish();
     }
 }
