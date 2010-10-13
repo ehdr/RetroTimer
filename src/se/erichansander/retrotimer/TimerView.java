@@ -44,20 +44,27 @@ public class TimerView extends ImageView {
 	protected void onDraw(Canvas canvas) {
 		super.onDraw(canvas);
 
+		final float scale = 
+			getContext().getResources().getDisplayMetrics().density;
+		
+		float h = this.getHeight() * scale;
+		float w = this.getWidth() * scale;
+
 		Path mScalePath = new Path();
 
-		float middle = this.getHeight()/2f-10;
+		float middle = h/2f-10;
 		float sidePadding = 20f;
 		float ovalHeight = 90/2f;
 		
 		mScalePath.moveTo(sidePadding, middle);
 		mScalePath.addArc(new RectF(sidePadding,
 				middle-ovalHeight,
-				this.getWidth()-sidePadding,
+				w-sidePadding,
 				middle+ovalHeight),
 				150, -120);
 
-		canvas.drawTextOnPath(Long.toString(Math.round((double) mMillisLeft / 60000d)),
+		canvas.drawTextOnPath(
+				Long.toString(Math.round((float) mMillisLeft / 60000f)),
 				mScalePath, 0, 0, mScalePaint);
 	}
 }

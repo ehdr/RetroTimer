@@ -32,8 +32,12 @@ public class TimerSetView extends TimerView {
     }
 
 	private void onTurn(float dx) {
-		int w = this.getWidth();
-		
+		final float scale = 
+			getContext().getResources().getDisplayMetrics().density;
+
+		float w = this.getWidth()*scale;
+		dx *= scale;
+
 //		Log.d(DEBUG_TAG, "onTurn(dx=" + dx + "), mBeingChanged=" + mBeingChanged);
 //		Log.d(DEBUG_TAG, "getWidth()=" + w);
 
@@ -43,10 +47,10 @@ public class TimerSetView extends TimerView {
 		}
 
 		mMillisLeft = mMillisLeftBefore +
-				(long) (((double) -dx / w) * 20d * 60000d);
+				Math.round((-dx / w) * 20f * 60000f);
 
 		// Round to the closest full minute
-		mMillisLeft = Math.round((double) mMillisLeft / 60000d)*60000;
+		mMillisLeft = Math.round((float) mMillisLeft / 60000f)*60000;
 
 		if (mMillisLeft <= 0) {
     		mMillisLeft = 0;
