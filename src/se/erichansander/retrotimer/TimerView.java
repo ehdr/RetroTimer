@@ -24,7 +24,6 @@ public class TimerView extends ImageView {
 
 	public TimerView (Context context, AttributeSet attrs) {
 		super(context, attrs);
-		setImageResource(R.drawable.timer);
 		
 		// set the color and font size
 		mScalePaint = new Paint();
@@ -34,7 +33,7 @@ public class TimerView extends ImageView {
 		mScalePaint.setTextSize(32);
 		mScalePaint.setAntiAlias(true);
 	}
-    
+
     public void setMillisLeft(long millis) {
     	mMillisLeft = millis;
 

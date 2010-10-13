@@ -12,7 +12,6 @@ import android.os.Handler;
 import android.os.Vibrator;
 import android.preference.PreferenceManager;
 import android.util.Log;
-import android.widget.FrameLayout;
 
 /** Main activity for setting the timer */
 public class TimerSet extends Activity implements TimerSetListener {

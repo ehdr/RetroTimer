@@ -11,7 +11,6 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.FrameLayout;
 
 /** Activity to show while alarm is playing. */
 public class TimerAlert extends Activity implements TimerAlertListener {

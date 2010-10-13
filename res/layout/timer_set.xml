@@ -8,6 +8,7 @@
 
 	<se.erichansander.retrotimer.TimerSetView
 		android:id="@+id/timer_set_view"
+		android:src="@drawable/timer"
 		android:layout_centerHorizontal="true"
 		android:layout_height="wrap_content"
 		android:layout_width="wrap_content">

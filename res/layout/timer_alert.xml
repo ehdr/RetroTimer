@@ -18,6 +18,7 @@
 	
 	<se.erichansander.retrotimer.TimerAlertView
 		android:id="@+id/timer_alert_view"
+		android:src="@drawable/timer"
 		android:layout_centerHorizontal="true"
 		android:layout_height="wrap_content"
 		android:layout_width="wrap_content">
