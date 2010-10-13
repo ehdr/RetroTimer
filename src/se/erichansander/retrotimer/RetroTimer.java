@@ -4,6 +4,11 @@ package se.erichansander.retrotimer;
 //TODO: check what happens if e.g. a alarm clock alarm triggers while the timer alerts
 //TODO: check what happens if timer alerts while alarm clock triggers
 //TODO: phone doesn't wake up if alarm triggers while turned off?
+//TODO: add label on TimerAlert, "Touch to dimiss"
+//TODO: add buttons for toggling sound and vibration
+//TODO: animate TimerAlert?
+//TODO: add help screen?
+//TODO: add donate button?
 
 import android.app.AlarmManager;
 import android.app.Application;
