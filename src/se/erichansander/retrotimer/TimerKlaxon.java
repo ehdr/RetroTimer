@@ -70,7 +70,7 @@ public class TimerKlaxon extends Service {
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 case KILLER:
-                    sendKillBroadcast(mAlarmTime);
+                    broadcastSilenceAlarmIntent(mAlarmTime);
                     stopSelf();
                     break;
             }
@@ -86,7 +86,7 @@ public class TimerKlaxon extends Service {
             // we don't kill the alarm during a call.
             if (state != TelephonyManager.CALL_STATE_IDLE
                     && state != mInitialCallState) {
-                sendKillBroadcast(mAlarmTime);
+                broadcastSilenceAlarmIntent(mAlarmTime);
                 stopSelf();
             }
         }
@@ -148,7 +148,7 @@ public class TimerKlaxon extends Service {
         return START_STICKY;
     }
 
-    private void sendKillBroadcast(long alarmTime) {
+    private void broadcastSilenceAlarmIntent(long alarmTime) {
         Intent intent = new Intent(RetroTimer.ALARM_SILENCE_ACTION);
         intent.putExtra(RetroTimer.ALARM_TIME_EXTRA, alarmTime);
         sendBroadcast(intent);
@@ -254,9 +254,6 @@ public class TimerKlaxon extends Service {
     /**
      * Kills alarm audio after ALARM_TIMEOUT_SECONDS, so the alarm
      * won't run all day.
-     *
-     * This just cancels the audio, but leaves the notification
-     * popped, so the user will know that the alarm tripped.
      */
     private void enableKiller() {
         mHandler.sendMessageDelayed(mHandler.obtainMessage(KILLER),

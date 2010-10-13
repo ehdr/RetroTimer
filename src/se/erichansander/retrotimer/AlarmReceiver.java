@@ -30,9 +30,11 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 
 /**
- * Glue class: Receives intents:
+ * Glue class. Receives intents:
  * ALARM_TRIGGER_ACTION
  * ALARM_SILENCE_ACTION
+ * ALARM_DISMISS_ACTION
+ * and distributes actions to the other parts.
  */
 public class AlarmReceiver extends BroadcastReceiver {
 
@@ -41,6 +43,11 @@ public class AlarmReceiver extends BroadcastReceiver {
     /** If the alarm is older than STALE_WINDOW seconds, ignore.  It
         is probably the result of a time or timezone change */
     private final static int STALE_WINDOW = 60 * 30;
+    
+    /** Just a dummy ID for the NotificationManager. We only ever 
+     * show one type of notification at the time, so it doesn't 
+     * really matter. */
+    private final static int ALARM_ID = 0;
 
     private SharedPreferences mPrefs;
 
@@ -53,16 +60,28 @@ public class AlarmReceiver extends BroadcastReceiver {
 
     	if (Intent.ACTION_BOOT_COMPLETED.equals(intent.getAction())) {
     		RetroTimer.initAlarm(context);
-    		return;
+        } else if (RetroTimer.ALARM_TRIGGER_ACTION.equals(intent.getAction())) {
+        	handleAlarmTrigger(context, alarmTime);
     	} else if (RetroTimer.ALARM_SILENCE_ACTION.equals(intent.getAction())) {
-            // The alarm has been killed, update the notification
-            updateNotification(context, alarmTime);
-            return;
+            handleAlarmSilence(context, alarmTime);
+    	} else if (RetroTimer.ALARM_DISMISS_ACTION.equals(intent.getAction())) {
+            handleAlarmDismiss(context);
+        } else {
+        	// Unknown intent! Report an error and bail...
+        	Log.e(DEBUG_TAG, "Unknown intent received");
         }
-    	
-    	// Not ALARM_SILENCE_ACTION, so from now on it's ALARM_TRIGGER_ACTION
+    }
 
-        // Intentionally verbose: always log the alarm time to provide useful
+    /**
+     * Trigger the alarm, which means make some preparations, start
+     * the TimerKlaxon service (which will play alarm and start vibrating)
+     * and show a notification that allows dismissing the alarm. Also,
+     * show the TimerAlert activity, that also allows dismissing.
+     * 
+     * This is triggered by the AlarmManager.
+     */
+	private void handleAlarmTrigger(Context context, long alarmTime) {
+		// Intentionally verbose: always log the alarm time to provide useful
         // information in bug reports.
         long now = System.currentTimeMillis();
         SimpleDateFormat format =
@@ -101,12 +120,10 @@ public class AlarmReceiver extends BroadcastReceiver {
         editor.putLong(RetroTimer.PREF_ALARM_TIME, 0);
         editor.commit();
 
-        // Trigger a notification that, when clicked, will show the TimerAlert
-        // activity. No need to check for fullscreen since this will always be
-        // launched from a user action.
-        Intent notify = new Intent(context, TimerAlert.class);
+        // Trigger a notification that, when clicked, will dismiss the alarm.
+        Intent notify = new Intent(RetroTimer.ALARM_DISMISS_ACTION);
         PendingIntent pendingNotify =
-        		PendingIntent.getActivity(context, 0, notify, 0);
+        		PendingIntent.getBroadcast(context, 0, notify, 0);
 
         // Use the alarm's label or the default label as the ticker text and
         // main text of the notification.
@@ -117,17 +134,31 @@ public class AlarmReceiver extends BroadcastReceiver {
         		context.getString(R.string.alarm_notify_text),
                 pendingNotify);
         n.flags |= Notification.FLAG_SHOW_LIGHTS
-                | Notification.FLAG_ONGOING_EVENT;
+                | Notification.FLAG_ONGOING_EVENT
+                | Notification.FLAG_NO_CLEAR;
         n.defaults |= Notification.DEFAULT_LIGHTS;
 
         // Send the notification using the alarm id to easily identify the
         // correct notification.
         NotificationManager nm = (NotificationManager)
         		context.getSystemService(Context.NOTIFICATION_SERVICE);
-        nm.notify(0, n);
-    }
+        nm.notify(ALARM_ID, n);
+	}
 
-    private void updateNotification(Context context, long alarmTime) {
+	/**
+	 * Stops the TimerKlaxon service (to stop playing alarm and stop
+	 * vibrating) and displays a notification saying when the alarm 
+	 * triggered.
+	 * 
+	 * This is normally triggered by the application.
+	 */
+    private void handleAlarmSilence(Context context, long alarmTime) {
+        Log.v(DEBUG_TAG, "Alarm silenced");
+
+        // kill the Klaxon
+        context.stopService(new Intent(context, TimerKlaxon.class));
+
+        // Display notification
         NotificationManager nm = (NotificationManager)
 				context.getSystemService(Context.NOTIFICATION_SERVICE);
 
@@ -148,7 +179,24 @@ public class AlarmReceiver extends BroadcastReceiver {
         // We have to cancel the original notification since it is in the
         // ongoing section and we want the "killed" notification to be a plain
         // notification.
-        nm.cancel(0);
-        nm.notify(0, n);
+        nm.cancel(ALARM_ID);
+        nm.notify(ALARM_ID, n);
+    }
+
+    /**
+     * Stops the TimerKlaxon as above, and also removes any notifications.
+     * 
+     * This is normally triggered by a user action to dismiss the alarm.
+     */
+    private void handleAlarmDismiss(Context context) {
+        Log.v(DEBUG_TAG, "Alarm dismissed");
+
+        // kill the Klaxon
+        context.stopService(new Intent(context, TimerKlaxon.class));
+
+    	// Cancel the notification
+        NotificationManager nm = (NotificationManager)
+        		context.getSystemService(Context.NOTIFICATION_SERVICE);
+        nm.cancel(ALARM_ID);
     }
 }

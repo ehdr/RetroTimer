@@ -14,6 +14,7 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.FrameLayout;
 
+/** Main activity for setting the timer */
 public class TimerSet extends Activity implements TimerSetListener {
 
 	private static final String DEBUG_TAG = "TimerSet";
@@ -107,6 +108,20 @@ public class TimerSet extends Activity implements TimerSetListener {
     		mTempAtZero = true;
     	}
         updateTimeLeft();
+	}
+	
+	@Override
+	protected void onResume() {
+		super.onResume();
+		/* Make sure to dismiss the alarm, if one should happen to be
+		 * playing.
+		 * 
+		 * The user could have escaped from the TimerAlert activity
+		 * e.g. by pressing Home, which is fine, but chaos will ensue
+		 * if they are allowed to enter TimerSet with an alarm running!
+		 */
+        Intent intent = new Intent(RetroTimer.ALARM_DISMISS_ACTION);
+        sendBroadcast(intent);
 	}
 
 	@Override

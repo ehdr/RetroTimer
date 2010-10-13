@@ -2,7 +2,6 @@ package se.erichansander.retrotimer;
 
 import se.erichansander.retrotimer.TimerAlertView.TimerAlertListener;
 import android.app.Activity;
-import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -14,17 +13,18 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
 
+/** Activity to show while alarm is playing. */
 public class TimerAlert extends Activity implements TimerAlertListener {
 
 	private static final String DEBUG_TAG = "TimerAlert";
 
 	private TimerAlertView mTimer;
 
-	// Received to handle ALARM_SILENCE_ACTION
+	// Received to handle ALARM_SILENCE_ACTION and ALARM_DISMISS_ACTION
     private BroadcastReceiver mReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-        	dismissAlarm(true);
+        	finish();
         }
     };
 
@@ -47,8 +47,9 @@ public class TimerAlert extends Activity implements TimerAlertListener {
     	mTimer.setTimerAlertListener(this);
     	frame.addView(this.mTimer);
 
-        IntentFilter filter = 
-        		new IntentFilter(RetroTimer.ALARM_SILENCE_ACTION);
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(RetroTimer.ALARM_DISMISS_ACTION);
+        filter.addAction(RetroTimer.ALARM_SILENCE_ACTION);
         registerReceiver(mReceiver, filter);
     }
     
@@ -76,8 +77,8 @@ public class TimerAlert extends Activity implements TimerAlertListener {
     	case KeyEvent.KEYCODE_CAMERA:
     	case KeyEvent.KEYCODE_FOCUS:
     		if (event.getAction() == KeyEvent.ACTION_UP) {
-//    			TODO: should the arg be true or false?
-    			dismissAlarm(false);
+//    			TODO: should this count as dismiss or silence?
+    			dismissAlarm();
     			break;
     		}
 
@@ -89,25 +90,12 @@ public class TimerAlert extends Activity implements TimerAlertListener {
 
     public void onAlertDismissed() {
     	Log.d(DEBUG_TAG, "onAlertDismissed()");
-    	dismissAlarm(false);
+    	dismissAlarm();
     }
     
-    private void dismissAlarm(boolean killed) {
-        Log.i(DEBUG_TAG, 
-        		killed ? "Alarm killed" : "Alarm dismissed by user");
-
-        // If the klaxon told us that the alarm has been killed, do not modify
-        // the notification or stop the service.
-
-        if (!killed) {
-            // Cancel the notification
-            NotificationManager nm = 
-            	(NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-            nm.cancel(0);
-
-            // kill the Klaxon
-            stopService(new Intent(this, TimerKlaxon.class));
-        }
+    private void dismissAlarm() {
+        Intent intent = new Intent(RetroTimer.ALARM_DISMISS_ACTION);
+        sendBroadcast(intent);
 
         finish();
     }

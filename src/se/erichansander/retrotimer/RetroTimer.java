@@ -1,6 +1,5 @@
 package se.erichansander.retrotimer;
 
-//TODO: handle escaping from the TimerAlert activity (by home button, back button, etc)
 //TODO: check what happens if e.g. a alarm clock alarm triggers while the timer alerts
 //TODO: check what happens if timer alerts while alarm clock triggers
 //TODO: phone doesn't wake up if alarm triggers while turned off?
