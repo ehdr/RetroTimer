@@ -1,7 +1,7 @@
 package se.erichansander.retrotimer;
 
 import android.content.Context;
-import android.util.Log;
+import android.util.AttributeSet;
 import android.view.View;
 import android.view.View.OnClickListener;
 
@@ -15,9 +15,9 @@ public class TimerAlertView extends TimerView implements OnClickListener {
 		abstract void onAlertDismissed();
 	}
 
-	public TimerAlertView (Context context) {
-		super(context);
-		
+	public TimerAlertView (Context context, AttributeSet attrs) {
+		super(context, attrs);
+
 		this.setOnClickListener(this);
 	}
 

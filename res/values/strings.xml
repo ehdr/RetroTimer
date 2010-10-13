@@ -2,7 +2,8 @@
 <resources>
     
     <string name="app_name">Retro Timer</string>
-<string name="alarm_notify_text">Select to dismiss this timer.</string>
-<string name="alarm_alert_alert_silenced">Retro Timer has triggered</string>
+<string name="alarm_notify_text">Select to dismiss this timer</string>
+<string name="alarm_alert_silenced">Retro Timer has triggered</string>
 <string name="timer_alert_name">Retro Timer Alert</string>
+<string name="touch_to_dismiss">Touch to dismiss</string>
 </resources>

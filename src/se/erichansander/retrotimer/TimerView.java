@@ -7,6 +7,7 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.RectF;
 import android.graphics.Typeface;
+import android.util.AttributeSet;
 import android.widget.ImageView;
 
 public class TimerView extends ImageView {
@@ -21,8 +22,8 @@ public class TimerView extends ImageView {
 
 	protected long mMillisLeft = 0;
 
-	public TimerView (Context context) {
-		super(context);
+	public TimerView (Context context, AttributeSet attrs) {
+		super(context, attrs);
 		setImageResource(R.drawable.timer);
 		
 		// set the color and font size

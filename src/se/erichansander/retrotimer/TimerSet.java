@@ -83,12 +83,10 @@ public class TimerSet extends Activity implements TimerSetListener {
 
         RetroTimer.initAlarm(this);
 
-        setContentView(R.layout.main);
+        setContentView(R.layout.timer_set);
 
-        FrameLayout frame = (FrameLayout) findViewById(R.id.timer_holder);
-    	mTimer = new TimerSetView(this);
+    	mTimer = (TimerSetView) findViewById(R.id.timer_set_view);
     	mTimer.setTimerSetListener(this);
-    	frame.addView(this.mTimer);
     }
 
 	@Override

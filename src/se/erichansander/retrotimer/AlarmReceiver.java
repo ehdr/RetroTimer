@@ -173,7 +173,7 @@ public class AlarmReceiver extends BroadcastReceiver {
         Notification n = new Notification(R.drawable.stat_notify_alarm,
                 label, alarmTime);
         n.setLatestEventInfo(context, label,
-                context.getString(R.string.alarm_alert_alert_silenced),
+                context.getString(R.string.alarm_alert_silenced),
                 intent);
         n.flags |= Notification.FLAG_AUTO_CANCEL;
         // We have to cancel the original notification since it is in the

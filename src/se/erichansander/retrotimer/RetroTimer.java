@@ -1,6 +1,6 @@
 package se.erichansander.retrotimer;
 
-//TODO: add label on TimerAlert, "Touch to dismiss"
+//TODO: fix the timer scale
 //TODO: add buttons for toggling sound and vibration
 //TODO: handle different screen orientations
 //TODO: handle different screen sizes

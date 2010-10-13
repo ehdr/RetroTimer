@@ -20,7 +20,7 @@
 				 android:name="RetroTimer" 
     			 android:debuggable="true">
  
-        <activity android:name="TimerSet"
+        <activity android:name=".TimerSet"
                   android:label="@string/app_name"
                   android:launchMode="singleInstance"
                   android:screenOrientation="portrait">
@@ -30,13 +30,13 @@
             </intent-filter>
         </activity>
 
-        <activity android:name="TimerAlert"
+        <activity android:name=".TimerAlert"
                   android:label="@string/timer_alert_name"
                   android:launchMode="singleInstance"
                   android:screenOrientation="portrait">
         </activity>
 
-        <receiver android:name="AlarmReceiver">
+        <receiver android:name=".AlarmReceiver">
         	<!-- RetroTimer specific intents -->
             <intent-filter>
                <action android:name="se.erichansander.retrotimer.ALARM_TRIGGER" />
@@ -53,7 +53,7 @@
         <!-- This service plays the alarm alert and vibrates the device.
              This allows the alert to continue playing even if another activity
              causes the AlarmAlert activity to pause. -->
-        <service android:name="TimerKlaxon">
+        <service android:name=".TimerKlaxon">
         </service>
 
     </application>

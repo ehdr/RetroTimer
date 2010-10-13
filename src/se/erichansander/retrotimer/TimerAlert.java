@@ -40,12 +40,10 @@ public class TimerAlert extends Activity implements TimerAlertListener {
         		| WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
         		| WindowManager.LayoutParams.FLAG_ALLOW_LOCK_WHILE_SCREEN_ON);
 
-        setContentView(R.layout.main);
+        setContentView(R.layout.timer_alert);
 
-        FrameLayout frame = (FrameLayout) findViewById(R.id.timer_holder);
-    	mTimer = new TimerAlertView(this);
+    	mTimer = (TimerAlertView) findViewById(R.id.timer_alert_view);
     	mTimer.setTimerAlertListener(this);
-    	frame.addView(this.mTimer);
 
         IntentFilter filter = new IntentFilter();
         filter.addAction(RetroTimer.ALARM_DISMISS_ACTION);

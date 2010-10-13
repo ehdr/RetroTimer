@@ -1,6 +1,7 @@
 package se.erichansander.retrotimer;
 
 import android.content.Context;
+import android.util.AttributeSet;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 
@@ -19,8 +20,8 @@ public class TimerSetView extends TimerView {
 		abstract void onTimerSetValue(long millis);
 	}
 
-	public TimerSetView (Context context) {
-		super(context);
+	public TimerSetView (Context context, AttributeSet attrs) {
+		super(context, attrs);
 
 		mGestures = new GestureDetector(context,
 				new TimerGestureListener(this));
@@ -47,7 +48,7 @@ public class TimerSetView extends TimerView {
 		}
 
 		mMillisLeft = mMillisLeftBefore +
-				Math.round((-dx / w) * 20f * 60000f);
+				Math.round((-dx / w) * 15f * 60000f);
 
 		// Round to the closest full minute
 		mMillisLeft = Math.round((float) mMillisLeft / 60000f)*60000;
