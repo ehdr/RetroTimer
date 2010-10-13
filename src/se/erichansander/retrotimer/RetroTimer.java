@@ -5,6 +5,9 @@ package se.erichansander.retrotimer;
 //TODO: phone doesn't wake up if alarm triggers while turned off?
 //TODO: add label on TimerAlert, "Touch to dimiss"
 //TODO: add buttons for toggling sound and vibration
+//TODO: handle different screen orientations
+//TODO: handle different screen sizes
+//TODO: handle setting alarm with the trackball
 //TODO: animate TimerAlert?
 //TODO: add help screen?
 //TODO: add donate button?
