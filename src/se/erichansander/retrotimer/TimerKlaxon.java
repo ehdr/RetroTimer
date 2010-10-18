@@ -159,11 +159,9 @@ public class TimerKlaxon extends Service {
         stop();
 
         if (!silent) {
-            Uri alert =
-            		RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
-
-            // TODO: Reuse mMediaPlayer instead of creating a new one and/or use
-            // RingtoneManager.
+            /* TODO: Reuse mMediaPlayer instead of creating a new one and/or
+             * use RingtoneManager.
+             */
             mMediaPlayer = new MediaPlayer();
             mMediaPlayer.setOnErrorListener(new OnErrorListener() {
                 public boolean onError(MediaPlayer mp, int what, int extra) {
@@ -186,7 +184,8 @@ public class TimerKlaxon extends Service {
                     setDataSourceFromResource(getResources(), mMediaPlayer,
                             R.raw.in_call_alarm);
                 } else {
-                    mMediaPlayer.setDataSource(this, alert);
+                    setDataSourceFromResource(getResources(), mMediaPlayer,
+                            R.raw.classic_alarm);
                 }
                 startAlarm(mMediaPlayer);
             } catch (Exception ex) {

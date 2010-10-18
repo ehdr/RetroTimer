@@ -33,21 +33,23 @@ public class TimerView extends ImageView {
 
 	public TimerView (Context context, AttributeSet attrs) {
 		super(context, attrs);
+
+		mScalePaint = new Paint();
+		mScalePaint.setColor(
+				getResources().getColor(R.color.timer_scale));
+		mScalePaint.setTypeface(Typeface.MONOSPACE);
+		mScalePaint.setAntiAlias(true);
+		// set the size in onSizeChanged, when we know how big the view is
 	}
 	
 	/** Re-calculate all drawing related variables when view size changes */
 	@Override
 	public void  onSizeChanged  (int intw, int inth, int oldw, int oldh) {
-		mDensityScale =  getResources().getDisplayMetrics().density;
+		mDensityScale = getResources().getDisplayMetrics().density;
 		Log.d(DEBUG_TAG, "mDensityScale=" + mDensityScale);
 
 		// set the color and font size for the scale
-		mScalePaint = new Paint();
-		mScalePaint.setColor(
-				getResources().getColor(R.color.timer_scale));
-		mScalePaint.setTypeface(Typeface.MONOSPACE);
 		mScalePaint.setTextSize(32*mDensityScale);
-		mScalePaint.setAntiAlias(true);
 
 		// measure the width of one letter (same for all since MONOSPACE)
 		float widths[] = new float[1];

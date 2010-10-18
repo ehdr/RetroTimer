@@ -1,6 +1,5 @@
 package se.erichansander.retrotimer;
 
-//TODO: the audio only plays on nexus one!
 //TODO: add buttons for toggling sound and vibration
 //TODO: handle different screen orientations
 //TODO: handle different screen sizes
@@ -10,8 +9,7 @@ package se.erichansander.retrotimer;
 //TODO: animate TimerAlert?
 
 // Bugs and testing:
-//TODO: phone doesn't wake up if alarm triggers while turned off?
-//TODO: screen doesn't turn on when alarm triggers
+//TODO: screen doesn't turn on when alarm triggers on 1.6
 //TODO: check what happens if e.g. a alarm clock alarm triggers while the timer alerts
 //TODO: check what happens if timer alerts while alarm clock triggers
 

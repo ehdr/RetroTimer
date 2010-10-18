@@ -21,7 +21,7 @@ import android.os.PowerManager;
 
 /**
  * Hold a wakelock that can be acquired in the AlarmReceiver and
- * released in the AlarmAlert activity
+ * released in the TimerAlert activity
  */
 class AlarmAlertWakeLock {
 
