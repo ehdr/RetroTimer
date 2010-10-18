@@ -3,8 +3,7 @@
 		xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
 	android:layout_height="fill_parent"
-	android:layout_width="fill_parent"
-	android:background="#707070">
+	android:layout_width="fill_parent">
 
 <!--
 	<ImageView
@@ -19,9 +18,10 @@
 	<se.erichansander.retrotimer.TimerAlertView
 		android:id="@+id/timer_alert_view"
 		android:src="@drawable/timer"
+		android:layout_centerVertical="true"
 		android:layout_centerHorizontal="true"
-		android:layout_height="wrap_content"
-		android:layout_width="wrap_content">
+		android:layout_height="386dp"
+		android:layout_width="320dp">
 	</se.erichansander.retrotimer.TimerAlertView>
 
 	<TextView
@@ -29,7 +29,7 @@
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:text="@string/touch_to_dismiss"
-        android:textColor="#E61A60"
+        android:textColor="@color/timer_scale"
         android:textSize="16dp"
         android:id="@+id/dismiss_text"
         android:layout_alignBottom="@+id/timer_alert_view"

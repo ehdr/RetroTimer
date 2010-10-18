@@ -1,18 +1,19 @@
 package se.erichansander.retrotimer;
 
-//TODO: fix the timer scale
+//TODO: the audio only plays on nexus one!
 //TODO: add buttons for toggling sound and vibration
 //TODO: handle different screen orientations
 //TODO: handle different screen sizes
-//TODO: handle setting alarm with the trackball
 //TODO: add help screen?
+//TODO: handle setting alarm with the trackball
 //TODO: add donate button?
 //TODO: animate TimerAlert?
 
 // Bugs and testing:
+//TODO: phone doesn't wake up if alarm triggers while turned off?
+//TODO: screen doesn't turn on when alarm triggers
 //TODO: check what happens if e.g. a alarm clock alarm triggers while the timer alerts
 //TODO: check what happens if timer alerts while alarm clock triggers
-//TODO: phone doesn't wake up if alarm triggers while turned off?
 
 import android.app.AlarmManager;
 import android.app.Application;
