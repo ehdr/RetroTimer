@@ -21,7 +21,10 @@ import android.os.PowerManager;
 
 /**
  * Hold a wakelock that can be acquired in the AlarmReceiver and
- * released in the TimerAlert activity
+ * released in the TimerAlert activity.
+ * 
+ * This file is borrowed almost without modification from the
+ * DeskClock app included with Android.
  */
 class AlarmAlertWakeLock {
 
@@ -38,7 +41,7 @@ class AlarmAlertWakeLock {
                 (PowerManager) context.getSystemService(Context.POWER_SERVICE);
 
         sCpuWakeLock = pm.newWakeLock(
-                PowerManager.PARTIAL_WAKE_LOCK |
+        		PowerManager.SCREEN_DIM_WAKE_LOCK |
                 PowerManager.ACQUIRE_CAUSES_WAKEUP |
                 PowerManager.ON_AFTER_RELEASE,
                 TAG);

@@ -4,12 +4,11 @@ package se.erichansander.retrotimer;
 //TODO: handle different screen orientations
 //TODO: handle different screen sizes
 //TODO: add help screen?
-//TODO: handle setting alarm with the trackball
 //TODO: add donate button?
 //TODO: animate TimerAlert?
+//TODO: handle setting alarm with the trackball
 
 // Bugs and testing:
-//TODO: screen doesn't turn on when alarm triggers on 1.6
 //TODO: check what happens if e.g. a alarm clock alarm triggers while the timer alerts
 //TODO: check what happens if timer alerts while alarm clock triggers
 
