@@ -1,16 +1,21 @@
 package se.erichansander.retrotimer;
 
-//TODO: add buttons for toggling sound and vibration
-//TODO: handle different screen orientations
-//TODO: handle different screen sizes
+//TODO: clean out all logging before publication
+//TODO: add graphics: launcher icon, notification icons,
+//		options menu icons?
+//TODO: fix license notices in every file
 //TODO: add help screen?
 //TODO: add donate button?
+//TODO: handle different screen orientations
+//TODO: handle different screen sizes
+
 //TODO: animate TimerAlert?
 //TODO: handle setting alarm with the trackball
 
 // Bugs and testing:
 //TODO: check what happens if e.g. a alarm clock alarm triggers while the timer alerts
 //TODO: check what happens if timer alerts while alarm clock triggers
+
 
 import android.app.AlarmManager;
 import android.app.Application;
@@ -60,13 +65,17 @@ public class RetroTimer extends Application {
 	
 
 	/** Is true when an alarm is set */
-	public static final String PREF_ALARM_SET = "prefs.alarm_set";
+	public static final String PREF_ALARM_SET = 
+			"prefs.alarm_set";
 	/** Absolute time when alarm should go off, in millis since epoch */ 
-	public static final String PREF_ALARM_TIME = "prefs.alarm_time";
-	/** Is true if alert should not play audio */
-	public static final String PREF_SILENT = "prefs.silent";
+	public static final String PREF_ALARM_TIME = 
+			"prefs.alarm_time";
+	/** Is true if alert should play audio */
+	public static final String PREF_RING_ON_ALARM =
+			"prefs.ring_on_alarm";
 	/** Is true if alert should vibrate device */
-	public static final String PREF_VIBRATE = "prefs.vibrate";
+	public static final String PREF_VIBRATE_ON_ALARM =
+			"prefs.vibrate_on_alarm";
 
 
 	/**

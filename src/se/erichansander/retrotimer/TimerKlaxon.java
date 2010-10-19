@@ -135,11 +135,13 @@ public class TimerKlaxon extends Service {
             return START_NOT_STICKY;
         }
         
-        boolean silent = mPrefs.getBoolean(RetroTimer.PREF_SILENT, false);
-        boolean vibrate = mPrefs.getBoolean(RetroTimer.PREF_VIBRATE, true);
+        boolean ring =
+        	mPrefs.getBoolean(RetroTimer.PREF_RING_ON_ALARM, true);
+        boolean vibrate = 
+        	mPrefs.getBoolean(RetroTimer.PREF_VIBRATE_ON_ALARM, true);
     	mAlarmTime = intent.getLongExtra(RetroTimer.ALARM_TIME_EXTRA, 0);
 
-        play(silent, vibrate);
+        play(ring, vibrate);
 
         // Record the initial call state here so that the new alarm has the
         // newest state.
@@ -154,11 +156,11 @@ public class TimerKlaxon extends Service {
         sendBroadcast(intent);
     }
 
-    private void play(boolean silent, boolean vibrate) {
+    private void play(boolean ring, boolean vibrate) {
         // stop() checks to see if we are already playing.
         stop();
 
-        if (!silent) {
+        if (ring) {
             /* TODO: Reuse mMediaPlayer instead of creating a new one and/or
              * use RingtoneManager.
              */

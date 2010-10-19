@@ -1,9 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    
+    <!-- Activity names -->
     <string name="app_name">Retro Timer</string>
-<string name="alarm_notify_text">Select to dismiss this timer</string>
-<string name="alarm_alert_silenced">Retro Timer has triggered</string>
-<string name="timer_alert_name">Retro Timer Alert</string>
-<string name="touch_to_dismiss">Touch to dismiss</string>
+	<string name="timer_alert_name">Retro Timer Alert</string>
+
+	<!-- Labels -->
+	<string name="touch_to_dismiss">Touch to dismiss</string>
+
+	<!-- NOtification texts -->
+	<string name="alarm_notify_text">Select to dismiss this timer</string>
+	<string name="alarm_alert_silenced">Retro Timer has triggered</string>
+
+	<!-- Menu labels -->
+	<string name="ring_on_alarm_turn_on">Ring!</string>
+	<string name="ring_on_alarm_turn_off">Don\'t ring</string>
+	<string name="vibrate_on_alarm_turn_on">Vibrate!</string>
+	<string name="vibrate_on_alarm_turn_off">Don\'t vibrate</string>
+
+	<!-- Toast texts -->
+	<string name="ring_on_alarm_turned_on">Will now ring on alarm</string>
+	<string name="ring_on_alarm_turned_off">Will now not ring on alarm</string>
+	<string name="vibrate_on_alarm_turned_on">Will now vibrate on alarm</string>
+	<string name="vibrate_on_alarm_turned_off">Will now not vibrate on alarm</string>
+
 </resources>

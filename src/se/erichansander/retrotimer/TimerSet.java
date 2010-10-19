@@ -12,6 +12,10 @@ import android.os.Handler;
 import android.os.Vibrator;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.widget.Toast;
 
 /** Main activity for setting the timer */
 public class TimerSet extends Activity implements TimerSetListener {
@@ -92,7 +96,8 @@ public class TimerSet extends Activity implements TimerSetListener {
     protected void onStart() {
         super.onStart();
 
-        /* install intent receiver for the events we need to update timer view */
+        /* install intent receiver for the events we need to update 
+         * timer view */
         IntentFilter filter = new IntentFilter();
         filter.addAction(Intent.ACTION_TIME_TICK); // the passage of time
 //      TODO: need special handling of _TIME_CHANGED and 
@@ -128,7 +133,96 @@ public class TimerSet extends Activity implements TimerSetListener {
 		/* stop updating clock when we are no longer running */
 		unregisterReceiver(mTickReceiver);
 	}
+	
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+	    MenuInflater inflater = getMenuInflater();
+	    inflater.inflate(R.menu.options_menu, menu);
+	    return true;
+	}
 
+	/** Sets the correct titles in the options menu, depending on the
+	 * current values of PREF_RING_ON_ALARM and PREF_VIBRATE_ON_ALARM.
+	 */
+	@Override
+	public boolean onPrepareOptionsMenu (Menu menu) {
+		MenuItem item;
+		
+		item = menu.findItem(R.id.ring_on_alarm);
+		if (mPrefs.getBoolean(RetroTimer.PREF_RING_ON_ALARM, true)) {
+			item.setTitle(R.string.ring_on_alarm_turn_off);
+		} else {
+			item.setTitle(R.string.ring_on_alarm_turn_on);			
+		}
+
+		item = menu.findItem(R.id.vibrate_on_alarm);
+		if (mPrefs.getBoolean(RetroTimer.PREF_VIBRATE_ON_ALARM, true)) {
+			item.setTitle(R.string.vibrate_on_alarm_turn_off);
+		} else {
+			item.setTitle(R.string.vibrate_on_alarm_turn_on);			
+		}
+
+		return true;
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		boolean tmp;
+		SharedPreferences.Editor ed = mPrefs.edit();
+		switch (item.getItemId()) {
+		  case R.id.ring_on_alarm:
+			  tmp =
+				  mPrefs.getBoolean(RetroTimer.PREF_RING_ON_ALARM, true);
+			  ed.putBoolean(RetroTimer.PREF_RING_ON_ALARM, !tmp);
+			  ed.commit();
+	
+			  if (mPrefs.getBoolean(RetroTimer.PREF_RING_ON_ALARM, true)) {
+				  Toast.makeText(this, 
+						  getResources().getString(
+								  R.string.ring_on_alarm_turned_on), 
+						  Toast.LENGTH_SHORT).show();
+			  } else {
+				  Toast.makeText(this, 
+						  getResources().getString(
+								  R.string.ring_on_alarm_turned_off), 
+						  Toast.LENGTH_SHORT).show();
+			  }
+			  return true;
+
+		  case R.id.vibrate_on_alarm:
+			  tmp =
+				  mPrefs.getBoolean(RetroTimer.PREF_VIBRATE_ON_ALARM, true);
+			  ed.putBoolean(RetroTimer.PREF_VIBRATE_ON_ALARM, !tmp);
+			  ed.commit();
+
+			  if (mPrefs.getBoolean(RetroTimer.PREF_VIBRATE_ON_ALARM, true)) {
+				  Toast.makeText(this, 
+						  getResources().getString(
+								  R.string.vibrate_on_alarm_turned_on), 
+						  Toast.LENGTH_SHORT).show();
+			  } else {
+				  Toast.makeText(this, 
+						  getResources().getString(
+								  R.string.vibrate_on_alarm_turned_off), 
+						  Toast.LENGTH_SHORT).show();
+			  }
+			  return true;
+			  
+		  default:
+			  Log.w(DEBUG_TAG, "Unknown selection from options menu!");
+			  return super.onOptionsItemSelected(item);
+		}
+	}
+	
+
+	// Callback functions for the TimerSetView class
+	
+	/** Displays the new (temporary) time left and vibrates if the dial is 
+	 * turned all the way down to zero.
+	 * 
+	 * This method is called when the user is in the process of turning
+	 * the dial, before releasing it (which sets it).
+	 */
 	public void onTimerTempValue(long millisLeft) {
 //    	Log.d(DEBUG_TAG, "onTimerTempValue(millisLeft=" + millisLeft + ")");
 
@@ -139,8 +233,10 @@ public class TimerSet extends Activity implements TimerSetListener {
     	if (millisLeft <= 0) {
     		millisLeft = 0;
     		
-    		// Only vibrate if we are not already at zero
-    		if (!mTempAtZero) {
+    		// Only vibrate if vibration is turned on, and 
+    		// we are not already at zero
+    		if (mPrefs.getBoolean(RetroTimer.PREF_VIBRATE_ON_ALARM, true) &&
+    				!mTempAtZero) {
     			mVibrator.vibrate(mZeroVibrateDurationMillis);
     		}
     		mTempAtZero = true;
@@ -151,7 +247,10 @@ public class TimerSet extends Activity implements TimerSetListener {
     	updateTimeLeft(millisLeft);
     }
 
-
+	/** Actually sets the new timer value
+	 * 
+	 * If at zero, cancels the alarm instead. 
+	 */
     public void onTimerSetValue (long millisLeft) {
     	Log.d(DEBUG_TAG, "onTimerSetValue(millisLeft=" + millisLeft + ")");
 
