@@ -86,11 +86,11 @@ public class TimerView extends ImageView {
 				", mPathLen=" + mPathLen);
 		
 		mLettersInScale = 
-				(int) Math.round(Math.floor(mPathLen / mLetterWidth));
+				(int) Math.round(mPathLen / mLetterWidth);
 		if (mLettersInScale % 2 == 0) mLettersInScale -= 1;
 		mScaleStartOffset =
 			(mPathLen - mLetterWidth * mLettersInScale) / 2
-			- mLetterWidth / 6;
+			- mLetterWidth / 10;
 		Log.d(DEBUG_TAG,
 				"mLettersInScale=" + mLettersInScale +
 				", mScaleStartOffset=" + mScaleStartOffset);
