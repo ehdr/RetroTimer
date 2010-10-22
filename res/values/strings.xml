@@ -2,7 +2,7 @@
 <resources>
     <!-- Activity names -->
     <string name="app_name">RetroTimer</string>
-	<string name="timer_alert_name">Retro Timer Alert</string>
+	<string name="timer_alert_name">RetroTimer Alarm</string>
 
 	<!-- URLs -->
 	<string name="donate_url">https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=6Y5VTZV7CRC6U</string>

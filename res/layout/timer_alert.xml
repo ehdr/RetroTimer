@@ -20,9 +20,10 @@
         android:layout_centerHorizontal="true"
         android:text="@string/touch_to_dismiss"
         android:textColor="@color/timer_scale"
-        android:textSize="16dp"
+        android:background="@android:color/transparent"
+        android:textSize="20dp"
         android:id="@+id/dismiss_text"
         android:layout_alignBottom="@+id/timer_alert_view"
-        android:layout_marginBottom="40dp">
+        android:layout_marginBottom="60dp">
 	</TextView>
 </RelativeLayout>
