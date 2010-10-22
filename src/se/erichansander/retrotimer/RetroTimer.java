@@ -5,7 +5,6 @@ package se.erichansander.retrotimer;
 //		options menu icons?
 //TODO: fix license notices in every file
 //TODO: add help screen?
-//TODO: add donate button?
 //TODO: handle different screen orientations
 //TODO: handle different screen sizes
 
