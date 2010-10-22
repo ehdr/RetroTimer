@@ -1,8 +1,6 @@
 package se.erichansander.retrotimer;
 
 //TODO: clean out all logging before publication
-//TODO: add graphics: launcher icon, notification icons,
-//		options menu icons?
 //TODO: fix license notices in every file
 //TODO: add help screen?
 //TODO: handle different screen orientations
