@@ -47,7 +47,7 @@ public class TimerView extends ImageView {
 	public void  onSizeChanged  (int intw, int inth, int oldw, int oldh) {
 		mDensityScale = getResources().getDisplayMetrics().density;
 		Log.d(DEBUG_TAG, "mDensityScale=" + mDensityScale);
-
+		
 		// set the color and font size for the scale
 		mScalePaint.setTextSize(32*mDensityScale);
 
@@ -63,15 +63,9 @@ public class TimerView extends ImageView {
 		float h = (float) inth;
 		float w = (float) intw;
 
-		//TODO: check actual measured h and w on different devices,
-		//and see if the correlate to mDensityScale. If so, make do
-		//without the hScale and wScale.
-		final float hScale = h/386f;
-		final float wScale = w/296f;
-
-		float middle = h/2-10f*hScale;
-		float sidePadding = 20f*wScale;
-		float ovalHeight = 90f*hScale/2;
+		float middle = h*0.47f;
+		float sidePadding = w*0.02f;
+		float ovalHeight = h*0.14f;
 
 		mScalePath.moveTo(sidePadding, middle);
 		mScalePath.addArc(new RectF(sidePadding,
@@ -90,7 +84,7 @@ public class TimerView extends ImageView {
 		if (mLettersInScale % 2 == 0) mLettersInScale -= 1;
 		mScaleStartOffset =
 			(mPathLen - mLetterWidth * mLettersInScale) / 2
-			- mLetterWidth / 10;
+			- mLetterWidth / (12*mDensityScale);
 		Log.d(DEBUG_TAG,
 				"mLettersInScale=" + mLettersInScale +
 				", mScaleStartOffset=" + mScaleStartOffset);

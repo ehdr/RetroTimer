@@ -23,7 +23,7 @@
         <activity android:name=".TimerSet"
                   android:label="@string/app_name"
                   android:launchMode="singleInstance"
-                  android:theme="@android:style/Theme.Translucent"
+                  android:theme="@style/timer_theme"
                   android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -34,7 +34,7 @@
         <activity android:name=".TimerAlert"
                   android:label="@string/timer_alert_name"
                   android:launchMode="singleInstance"
-                  android:theme="@android:style/Theme.Translucent"
+                  android:theme="@style/timer_theme"
                   android:screenOrientation="portrait">
         </activity>
 

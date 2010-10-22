@@ -1,27 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout
 		xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-	android:layout_height="fill_parent"
-	android:layout_width="fill_parent">
-
-<!--
-	<ImageView
-		android:id="@+id/timer_alert_view"
-		android:layout_centerHorizontal="true"
-		android:layout_height="386dp"
-		android:layout_width="320dp"
-		android:src="@drawable/timer">
-	</ImageView>
--->
+    	android:orientation="vertical"
+		android:layout_height="fill_parent"
+		android:layout_width="fill_parent">
 	
 	<se.erichansander.retrotimer.TimerAlertView
 		android:id="@+id/timer_alert_view"
 		android:src="@drawable/timer"
 		android:layout_centerVertical="true"
 		android:layout_centerHorizontal="true"
-		android:layout_height="386dp"
-		android:layout_width="320dp">
+		android:layout_height="420dp"
+		android:layout_width="360dp">
 	</se.erichansander.retrotimer.TimerAlertView>
 
 	<TextView
