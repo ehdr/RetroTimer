@@ -34,7 +34,7 @@ import android.util.Log;
  * ALARM_TRIGGER_ACTION
  * ALARM_SILENCE_ACTION
  * ALARM_DISMISS_ACTION
- * and distributes actions to the other parts.
+ * and distributes actions to the other parts of the app.
  */
 public class AlarmReceiver extends BroadcastReceiver {
 
@@ -68,7 +68,7 @@ public class AlarmReceiver extends BroadcastReceiver {
             handleAlarmDismiss(context);
         } else {
         	// Unknown intent! Report an error and bail...
-        	Log.e(DEBUG_TAG, "Unknown intent received");
+        	Log.w(DEBUG_TAG, "Unknown intent received");
         }
     }
 
@@ -125,21 +125,21 @@ public class AlarmReceiver extends BroadcastReceiver {
         PendingIntent pendingNotify =
         		PendingIntent.getBroadcast(context, 0, notify, 0);
 
-        // Use the alarm's label or the default label as the ticker text and
-        // main text of the notification.
+        /* Use the alarm's label or the default label as the ticker text and
+         * main text of the notification. */
         String label = context.getString(R.string.app_name);
-        Notification n = new Notification(R.drawable.stat_notify_alarm,
+        Notification n = new Notification(R.drawable.ic_stat_notify,
                 label, alarmTime);
         n.setLatestEventInfo(context, label,
-        		context.getString(R.string.alarm_notify_text),
+        		context.getString(R.string.notify_triggered),
                 pendingNotify);
         n.flags |= Notification.FLAG_SHOW_LIGHTS
                 | Notification.FLAG_ONGOING_EVENT
                 | Notification.FLAG_NO_CLEAR;
         n.defaults |= Notification.DEFAULT_LIGHTS;
 
-        // Send the notification using the alarm id to easily identify the
-        // correct notification.
+        /* Send the notification using the alarm id to easily identify the
+         * correct notification. */
         NotificationManager nm = (NotificationManager)
         		context.getSystemService(Context.NOTIFICATION_SERVICE);
         nm.notify(ALARM_ID, n);
@@ -170,10 +170,10 @@ public class AlarmReceiver extends BroadcastReceiver {
         // Update the notification to indicate that the alert has been
         // silenced.
         String label = context.getString(R.string.app_name);
-        Notification n = new Notification(R.drawable.stat_notify_alarm,
+        Notification n = new Notification(R.drawable.ic_stat_notify,
                 label, alarmTime);
         n.setLatestEventInfo(context, label,
-                context.getString(R.string.alarm_alert_silenced),
+                context.getString(R.string.notify_silenced),
                 intent);
         n.flags |= Notification.FLAG_AUTO_CANCEL;
         // We have to cancel the original notification since it is in the

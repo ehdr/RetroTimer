@@ -2,7 +2,7 @@
 <resources>
     <!-- Activity names -->
     <string name="app_name">RetroTimer</string>
-	<string name="timer_alert_name">RetroTimer Alarm</string>
+	<string name="timer_alert_name">RetroTimer Alert</string>
 
 	<!-- URLs -->
 	<string name="donate_url">https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=6Y5VTZV7CRC6U</string>
@@ -11,8 +11,8 @@
 	<string name="touch_to_dismiss">Touch to dismiss</string>
 
 	<!-- NOtification texts -->
-	<string name="alarm_notify_text">Select to dismiss this timer</string>
-	<string name="alarm_alert_silenced">Retro Timer has triggered</string>
+	<string name="notify_triggered">Select to dismiss this timer</string>
+	<string name="notify_silenced">RetroTimer alarm has triggered</string>
 
 	<!-- Menu labels -->
 	<string name="ring_on_alarm_turn_on">Ring!</string>
