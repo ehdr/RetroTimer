@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/license_notice_scroller"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:paddingTop="2dip"
+    android:paddingBottom="12dip" 
+    android:paddingLeft="14dip"
+    android:paddingRight="10dip">
+
+    <TextView android:id="@+id/license_notice_text"
+    	style="?android:attr/textAppearanceSmall"
+    	android:text="@string/license_notice_text"
+        android:layout_width="fill_parent" 
+        android:layout_height="wrap_content"
+        android:autoLink="web"
+        android:padding="5dip" />
+
+</ScrollView>

@@ -87,8 +87,13 @@ public class RetroTimer extends Application {
 	/** Is true if alert should vibrate device */
 	public static final String PREF_VIBRATE_ON_ALARM =
 			"prefs.vibrate_on_alarm";
+	/** Is true if the licensing dialog has been shown (when the app
+	 * was started for the first time).
+	 */
+	public static final String PREF_HAVE_SHOWN_LICENSE =
+			"prefs.have_shown_license";
 
-
+	
 	/**
 	 * Initializes the app state, and initializes the AlarmManager is 
 	 * any alarms are pending.

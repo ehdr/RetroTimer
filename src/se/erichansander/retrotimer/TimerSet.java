@@ -21,6 +21,8 @@ package se.erichansander.retrotimer;
 
 import se.erichansander.retrotimer.TimerSetView.TimerSetListener;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -35,12 +37,16 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
 /** Main activity for setting the timer */
 public class TimerSet extends Activity implements TimerSetListener {
 
 	private static final String DEBUG_TAG = "TimerSet";
+	
+	// Identifier for the dialog displaying the program's license
+	private static final int DIALOG_LICENSE_ID = 1;
 
     // How long to vibrate when timer dial goes to zero
     private final long mZeroVibrateDurationMillis = 200;
@@ -144,6 +150,11 @@ public class TimerSet extends Activity implements TimerSetListener {
 		 */
         Intent intent = new Intent(RetroTimer.ALARM_DISMISS_ACTION);
         sendBroadcast(intent);
+
+        if (!mPrefs.getBoolean(RetroTimer.PREF_HAVE_SHOWN_LICENSE,
+        		false)) {
+        	showDialog(DIALOG_LICENSE_ID);
+        }
 	}
 
 	@Override
@@ -154,6 +165,40 @@ public class TimerSet extends Activity implements TimerSetListener {
 		unregisterReceiver(mTickReceiver);
 	}
 	
+	@Override
+	protected Dialog onCreateDialog(int id) {
+		Dialog dialog;
+
+		switch (id) {
+		/* Display a dialog, showing the GNU GPL license notice the
+		 * first time the app is launched. */
+		case DIALOG_LICENSE_ID:
+			// use a custom View to get clickable links in the dialog
+			View view = View.inflate(this, R.layout.license_notice, null);
+			AlertDialog.Builder builder = new AlertDialog.Builder(this);
+			builder.setTitle(R.string.license_notice_title)
+					.setView(view)
+					.setCancelable(false)
+					.setPositiveButton(
+							R.string.license_notice_button,
+							null);
+			dialog = builder.create();
+
+			// remember that we have showed the license
+			SharedPreferences.Editor ed = mPrefs.edit();
+			ed.putBoolean(RetroTimer.PREF_HAVE_SHOWN_LICENSE, 
+					true);
+			ed.commit();
+			break;
+
+		default:
+			Log.w(DEBUG_TAG, "Unknown dialog ID in onCreateDialog()");
+			return null;
+		}
+		
+		return dialog;
+	}
+
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 	    MenuInflater inflater = getMenuInflater();

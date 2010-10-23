@@ -1,0 +1,13 @@
+Copyright (C) 2010  Eric Hansander
+
+RetroTimer is a wonderfully simple, no-nonsense countdown timer.
+Inspired by an old-fashioned analog egg timer, you just turn the
+dial and the alarm is set! To cancel the alarm, just turn it
+back down to zero.
+
+The feature set has intentionally been kept very small, so it
+won't distract you from what you are trying to get done. Your
+only options are to toggle the ringer and vibrator, so you can
+use it e.g. in an open office environment.
+
+For more information, see: http://github.com/ehdr/RetroTimer

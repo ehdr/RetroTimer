@@ -26,4 +26,23 @@
 	<string name="vibrate_on_alarm_turned_on">Will now vibrate on alarm</string>
 	<string name="vibrate_on_alarm_turned_off">Will now not vibrate on alarm</string>
 
+	<!-- License notice -->
+	<string name="license_notice_title">License notice</string>
+	<string name="license_notice_text">
+Copyright (C) 2010  Eric Hansander\n
+\n
+  RetroTimer is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.\n
+\n
+  RetroTimer is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.\n
+\n
+  You should have received a copy of the GNU General Public License
+  along with RetroTimer.  If not, see http://www.gnu.org/licenses/.
+</string>
+	<string name="license_notice_button">OK</string>
 </resources>
