@@ -47,14 +47,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
-import android.util.Log;
 
 /**
  * Glue class. Receives intents:
  * ALARM_TRIGGER_ACTION
  * ALARM_SILENCE_ACTION
  * ALARM_DISMISS_ACTION
- * and distributes actions to the other parts of the app.
+ * and distributes actions to the other parts of the app (by starting
+ * services and activities, and triggering notifications).
  */
 public class AlarmReceiver extends BroadcastReceiver {
 
@@ -88,7 +88,7 @@ public class AlarmReceiver extends BroadcastReceiver {
             handleAlarmDismiss(context);
         } else {
         	// Unknown intent! Report an error and bail...
-        	Log.w(DEBUG_TAG, "Unknown intent received");
+        	Elog.w(DEBUG_TAG, "Unknown intent received");
         }
     }
 
@@ -106,16 +106,16 @@ public class AlarmReceiver extends BroadcastReceiver {
         long now = System.currentTimeMillis();
         SimpleDateFormat format =
                 new SimpleDateFormat("HH:mm:ss.SSS aaa");
-        Log.v(DEBUG_TAG, "AlarmReceiver.onReceive() id setFor "
+        Elog.v(DEBUG_TAG, ".onReceive() id setFor "
                 + format.format(new Date(alarmTime)));
 
         if (now > alarmTime + STALE_WINDOW * 1000) {
-            Log.v(DEBUG_TAG, "AlarmReceiver ignoring stale alarm");
+            Elog.v(DEBUG_TAG, "ignoring stale alarm");
             return;
         }
 
-        // Maintain a cpu wake lock until the AlarmAlert and AlarmKlaxon can
-        // pick it up.
+        /* Maintain a cpu wake lock until the AlarmAlert and AlarmKlaxon
+         * can pick it up. */
         WakeLockHolder.acquireCpuWakeLock(context);
 
         /* Close dialogs and window shade */
@@ -145,8 +145,6 @@ public class AlarmReceiver extends BroadcastReceiver {
         PendingIntent pendingNotify =
         		PendingIntent.getBroadcast(context, 0, notify, 0);
 
-        /* Use the alarm's label or the default label as the ticker text and
-         * main text of the notification. */
         String label = context.getString(R.string.app_name);
         Notification n = new Notification(R.drawable.ic_stat_notify,
                 label, alarmTime);
@@ -170,10 +168,10 @@ public class AlarmReceiver extends BroadcastReceiver {
 	 * vibrating) and displays a notification saying when the alarm 
 	 * triggered.
 	 * 
-	 * This is normally triggered by the application.
+	 * This is normally triggered by the application (not the user).
 	 */
     private void handleAlarmSilence(Context context, long alarmTime) {
-        Log.v(DEBUG_TAG, "Alarm silenced");
+        Elog.v(DEBUG_TAG, "Alarm silenced");
 
         // kill the Klaxon
         context.stopService(new Intent(context, TimerKlaxon.class));
@@ -209,7 +207,7 @@ public class AlarmReceiver extends BroadcastReceiver {
      * This is normally triggered by a user action to dismiss the alarm.
      */
     private void handleAlarmDismiss(Context context) {
-        Log.v(DEBUG_TAG, "Alarm dismissed");
+        Elog.v(DEBUG_TAG, "Alarm dismissed");
 
         // kill the Klaxon
         context.stopService(new Intent(context, TimerKlaxon.class));

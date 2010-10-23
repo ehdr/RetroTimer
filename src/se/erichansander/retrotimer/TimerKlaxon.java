@@ -52,22 +52,23 @@ import android.os.Vibrator;
 import android.preference.PreferenceManager;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
-import android.util.Log;
 
 /**
  * Plays alarm and vibrates. Runs as a service so that it can continue to play
- * if another activity overrides the TimerSet view.
- * 
- * Receives the ALARM_PLAY intent when started.
+ * if another activity overrides the TimerAlert view.
+ *
+ * Receives the ALARM_PLAY_ACTION intent when started.
  */
 public class TimerKlaxon extends Service {
 
 	private static final String DEBUG_TAG = "TimerKlaxon";
 
-    // Volume suggested by media team for in-call alarms.
+    /* Comment from the DeskClock app:
+	 * Volume suggested by media team for in-call alarms. */
     private static final float IN_CALL_VOLUME = 0.125f;
 
-    /** Max time to play alarm before silencing */
+    /* Max time to play alarm before silencing */
+    // TODO: put this in SharedPreferences instead.
     private static final int ALARM_TIMEOUT_SECONDS = 30;
 
     private static final long[] sVibratePattern = new long[] { 500, 500 };
@@ -82,12 +83,12 @@ public class TimerKlaxon extends Service {
     private long mAlarmTime = 0;
     private int mInitialCallState;
 
-    // Internal messages
-    private static final int KILLER = 1000;
+    // Internal messages. Handles alarm timeouts.
+    private static final int TIMEOUT_ID = 1000;
     private Handler mHandler = new Handler() {
         public void handleMessage(Message msg) {
             switch (msg.what) {
-                case KILLER:
+                case TIMEOUT_ID:
                     broadcastSilenceAlarmIntent(mAlarmTime);
                     stopSelf();
                     break;
@@ -95,13 +96,15 @@ public class TimerKlaxon extends Service {
         }
     };
 
-    private PhoneStateListener mPhoneStateListener = new PhoneStateListener() {
+    private PhoneStateListener mPhoneStateListener = 
+    		new PhoneStateListener() {
         @Override
         public void onCallStateChanged(int state, String ignored) {
-            // The user might already be in a call when the alarm fires. When
-            // we register onCallStateChanged, we get the initial in-call state
-            // which kills the alarm. Check against the initial call state so
-            // we don't kill the alarm during a call.
+            /* The user might already be in a call when the alarm fires.
+             * When we register onCallStateChanged, we get the initial
+             * in-call state which kills the alarm. Check against the
+             * initial call state so we don't kill the alarm during a
+             * call. */
             if (state != TelephonyManager.CALL_STATE_IDLE
                     && state != mInitialCallState) {
                 broadcastSilenceAlarmIntent(mAlarmTime);
@@ -113,7 +116,6 @@ public class TimerKlaxon extends Service {
     @Override
     public void onCreate() {
         mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
-
         mVibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
         
         // Listen for incoming calls to kill the alarm.
@@ -140,12 +142,15 @@ public class TimerKlaxon extends Service {
 
     @Override
     public void onStart(Intent intent, int startId) {
+    	// For backwards compatibility with pre-API 8 systems
     	onStartCommand(intent, 0, startId);
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-    	Log.d(DEBUG_TAG, "onStartCommand(., flags=" + flags +", startId=" + startId + ")");
+    	Elog.v(DEBUG_TAG, 
+    			"onStartCommand(., flags=" +
+    			flags +", startId=" + startId + ")");
 
         // No intent, tell the system not to restart us.
         if (intent == null) {
@@ -179,27 +184,25 @@ public class TimerKlaxon extends Service {
         stop();
 
         if (ring) {
-            /* TODO: Reuse mMediaPlayer instead of creating a new one and/or
-             * use RingtoneManager.
-             */
             mMediaPlayer = new MediaPlayer();
             mMediaPlayer.setOnErrorListener(new OnErrorListener() {
-                public boolean onError(MediaPlayer mp, int what, int extra) {
-                    Log.e(DEBUG_TAG,
-                    		"Error occurred while playing alarm sound.");
-                    mp.stop();
-                    mp.release();
-                    mMediaPlayer = null;
-                    return true;
-                }
+            	public boolean onError(MediaPlayer mp, int what, int extra) {
+            		Elog.w(DEBUG_TAG,
+            				"Error occurred while playing alarm sound.");
+            		mp.stop();
+            		mp.release();
+            		mMediaPlayer = null;
+            		return true;
+            	}
             });
 
             try {
-                // Check if we are in a call. If we are, use the in-call alarm
-                // resource at a low volume to not disrupt the call.
+                /* Check if we are in a call. If we are, use the in-call
+                 * alarm resource at a low volume to not disrupt the
+                 * call. */
                 if (mTelephonyManager.getCallState()
                         != TelephonyManager.CALL_STATE_IDLE) {
-                    Log.v(DEBUG_TAG, "Using the in-call alarm");
+                    Elog.v(DEBUG_TAG, "Using the in-call alarm");
                     mMediaPlayer.setVolume(IN_CALL_VOLUME, IN_CALL_VOLUME);
                     setDataSourceFromResource(getResources(), mMediaPlayer,
                             R.raw.in_call_alarm);
@@ -209,7 +212,7 @@ public class TimerKlaxon extends Service {
                 }
                 startAlarm(mMediaPlayer);
             } catch (Exception ex) {
-                Log.e(DEBUG_TAG, "Failed to play ringtone: " + ex);
+                Elog.w(DEBUG_TAG, "Failed to play ringtone: " + ex);
             }
         }
 
@@ -220,7 +223,7 @@ public class TimerKlaxon extends Service {
             mVibrator.cancel();
         }
 
-        enableKiller();
+        startTimeoutCountdown();
         mPlaying = true;
     }
 
@@ -230,8 +233,8 @@ public class TimerKlaxon extends Service {
                    IllegalStateException {
         final AudioManager audioManager =
         		(AudioManager)getSystemService(Context.AUDIO_SERVICE);
-        // do not play alarms if stream volume is 0
-        // (typically because ringer mode is silent).
+        /* do not play alarms if stream volume is 0 (typically because 
+         * ringer mode is silent). */
         if (audioManager.getStreamVolume(AudioManager.STREAM_ALARM) != 0) {
             player.setAudioStreamType(AudioManager.STREAM_ALARM);
             player.setLooping(true);
@@ -267,19 +270,20 @@ public class TimerKlaxon extends Service {
             // Stop vibrator
             mVibrator.cancel();
         }
-        disableKiller();
+        cancelTimeoutCountdown();
     }
 
     /**
      * Kills alarm audio after ALARM_TIMEOUT_SECONDS, so the alarm
      * won't run all day.
      */
-    private void enableKiller() {
-        mHandler.sendMessageDelayed(mHandler.obtainMessage(KILLER),
+    private void startTimeoutCountdown() {
+        mHandler.sendMessageDelayed(mHandler.obtainMessage(TIMEOUT_ID),
                 1000 * ALARM_TIMEOUT_SECONDS);
     }
 
-    private void disableKiller() {
-        mHandler.removeMessages(KILLER);
+    /* Cancels the timeout countdown */
+    private void cancelTimeoutCountdown() {
+        mHandler.removeMessages(TIMEOUT_ID);
     }
 }

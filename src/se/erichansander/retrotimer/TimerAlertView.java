@@ -24,6 +24,7 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.view.View.OnClickListener;
 
+/** Special view for displaying the timer, and handling touch events. */
 public class TimerAlertView extends TimerView implements OnClickListener {
 
 	private static final String DEBUG_TAG = "TimerAlertView";
@@ -46,7 +47,7 @@ public class TimerAlertView extends TimerView implements OnClickListener {
     
     @Override
     public void onClick(View v) {
-//    	Log.d(DEBUG_TAG, "onClick");
+//    	Elog.v(DEBUG_TAG, "onClick");
     	
     	mListener.onAlertDismissed();
     }

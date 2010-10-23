@@ -26,19 +26,20 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Window;
 import android.view.WindowManager;
 
-/** Activity to show while alarm is playing. */
+/** Activity to show while alarm is playing.
+ * Touching it will dismiss the alarm. */
 public class TimerAlert extends Activity implements TimerAlertListener {
 
 	private static final String DEBUG_TAG = "TimerAlert";
 
 	private TimerAlertView mTimer;
 
-	// Received to handle ALARM_SILENCE_ACTION and ALARM_DISMISS_ACTION
+	/* Receiver to handle ALARM_SILENCE_ACTION and 
+	 * ALARM_DISMISS_ACTION intents, by closing this activity */
     private BroadcastReceiver mReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -50,6 +51,8 @@ public class TimerAlert extends Activity implements TimerAlertListener {
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
         
+        /* Some preparations for handling the situation when the alarm
+         * triggers while the phone is locked. */
         final Window win = getWindow();
         win.addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
                 | WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
@@ -72,6 +75,9 @@ public class TimerAlert extends Activity implements TimerAlertListener {
     @Override
     public void onResume() {
     	super.onResume();
+    	/* When this activity is shown, we know for sure that the 
+    	 * alarm has triggered, i.e. there is zero time left 
+    	 * to alarm */
     	mTimer.setMillisLeft(0);
     }
 
@@ -79,7 +85,6 @@ public class TimerAlert extends Activity implements TimerAlertListener {
     public void onDestroy() {
         super.onDestroy();
 
-        // No longer care about the alarm being killed.
         unregisterReceiver(mReceiver);
     }
     
@@ -105,11 +110,12 @@ public class TimerAlert extends Activity implements TimerAlertListener {
     }
 
     public void onAlertDismissed() {
-    	Log.d(DEBUG_TAG, "onAlertDismissed()");
+    	Elog.v(DEBUG_TAG, "onAlertDismissed()");
     	dismissAlarm();
     }
     
     private void dismissAlarm() {
+    	// Broadcast ALARM_DISMISS_ACTION to kill the TimerKlaxon
         Intent intent = new Intent(RetroTimer.ALARM_DISMISS_ACTION);
         sendBroadcast(intent);
 

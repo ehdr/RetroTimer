@@ -24,6 +24,8 @@ import android.util.AttributeSet;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 
+/** Special view for displaying a timer, and for receiving touch
+ * events to turn the timer dial. */
 public class TimerSetView extends TimerView {
 
 	private static final String DEBUG_TAG = "TimerSetView";
@@ -58,8 +60,9 @@ public class TimerSetView extends TimerView {
 		float w = this.getWidth()*scale;
 		dx *= scale;
 
-//		Log.d(DEBUG_TAG, "onTurn(dx=" + dx + "), mBeingChanged=" + mBeingChanged);
-//		Log.d(DEBUG_TAG, "getWidth()=" + w);
+//		Elog.v(DEBUG_TAG, 
+//				"onTurn(dx=" + dx + "), mBeingChanged=" + mBeingChanged);
+//		Elog.v(DEBUG_TAG, "getWidth()=" + w);
 
 		if (mBeingChanged == false) {
 			mMillisLeftBefore = mMillisLeft;
@@ -120,7 +123,7 @@ public class TimerSetView extends TimerView {
 		@Override
 		public boolean onFling(MotionEvent e1, MotionEvent e2,
 				final float velocityX, final float velocityY) {
-//			Log.d(DEBUG_TAG, "onFling");
+//			Elog.v(DEBUG_TAG, "onFling");
 //			TODO: call callback for flinging
 			return true;
 		}
@@ -128,7 +131,7 @@ public class TimerSetView extends TimerView {
 		@Override
         public boolean onScroll(MotionEvent e1, MotionEvent e2,
                 float distanceX, float distanceY) {
-//			Log.d(DEBUG_TAG, "onScroll");
+//			Elog.v(DEBUG_TAG, "onScroll");
 			mView.onTurn(e2.getX() - e1.getX());
             return true;
 		}

@@ -27,14 +27,17 @@ import android.graphics.PathMeasure;
 import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.widget.ImageView;
 
-/** Custom view for displaying the timer and drawing the scale on it */
+/** Custom view for displaying the timer and drawing the scale on it.
+ * 
+ *  For interacting with the timer, see the special classes
+ *  TimerSetView and TimerAlertView. */
 public class TimerView extends ImageView {
 
 	private static final String DEBUG_TAG = "TimerView";
 
+	// TODO: put this in SharedPreferences instead.
 	public static final long TIMER_MAX_MINS = 59;
 
 	private Paint mScalePaint;
@@ -65,7 +68,7 @@ public class TimerView extends ImageView {
 	@Override
 	public void  onSizeChanged  (int intw, int inth, int oldw, int oldh) {
 		mDensityScale = getResources().getDisplayMetrics().density;
-		Log.d(DEBUG_TAG, "mDensityScale=" + mDensityScale);
+		Elog.d(DEBUG_TAG, "mDensityScale=" + mDensityScale);
 		
 		// set the color and font size for the scale
 		mScalePaint.setTextSize(32*mDensityScale);
@@ -74,7 +77,7 @@ public class TimerView extends ImageView {
 		float widths[] = new float[1];
 		mScalePaint.getTextWidths("...", 0, 1, widths);
 		mLetterWidth = widths[0];
-		Log.d(DEBUG_TAG, "mLetterWidth=" + mLetterWidth);
+		Elog.d(DEBUG_TAG, "mLetterWidth=" + mLetterWidth);
 
 		// create a curved path for drawing the text scale on
 		mScalePath = new Path();
@@ -94,7 +97,7 @@ public class TimerView extends ImageView {
 				150, -120);
 
 		mPathLen = (new PathMeasure(mScalePath, false)).getLength();
-		Log.d(DEBUG_TAG, 
+		Elog.d(DEBUG_TAG, 
 				"view h=" + h + ", w=" + w + 
 				", mPathLen=" + mPathLen);
 		
@@ -104,7 +107,7 @@ public class TimerView extends ImageView {
 		mScaleStartOffset =
 			(mPathLen - mLetterWidth * mLettersInScale) / 2
 			- mLetterWidth / (12*mDensityScale);
-		Log.d(DEBUG_TAG,
+		Elog.d(DEBUG_TAG,
 				"mLettersInScale=" + mLettersInScale +
 				", mScaleStartOffset=" + mScaleStartOffset);
 	}
@@ -136,7 +139,10 @@ public class TimerView extends ImageView {
 	 */
 	private String getScaleString(int length, int centerMinute) {
 
-		StringBuilder s = new StringBuilder();
+		/* The string might become slightly longer then length 
+		 * while we are building it, so add some spare. It will 
+		 * be trimmed before we return it. */
+		StringBuilder s = new StringBuilder(length + 3);
 		int bef = 0;
 		int aft = 0;
 
@@ -148,12 +154,11 @@ public class TimerView extends ImageView {
 			s.append(".");
 		}
 		
-//		Log.d(DEBUG_TAG, "bef=" + bef + ",aft=" + aft +
+//		Elog.v(DEBUG_TAG, "bef=" + bef + ",aft=" + aft +
 //				", s=" + s);
 
 		/* work our way outward, in both the positive and negative
-		 * directions
-		 */
+		 * directions from centerMinute */
 		for (int i = 1; i <= length / 2; i++) {
 			int min;
 
@@ -179,12 +184,12 @@ public class TimerView extends ImageView {
 			}
 			aft++;
 			
-//			Log.d(DEBUG_TAG, "i=" + i +
+//			Elog.v(DEBUG_TAG, "i=" + i +
 //					",bef=" + bef + ",aft=" + aft +
 //					", s=" + s);
 		}
 		
-//		Log.d(DEBUG_TAG, "c=" + centerMinute + 
+//		Elog.v(DEBUG_TAG, "c=" + centerMinute + 
 //				",bef=" + bef + ",aft=" + aft + 
 //				",s.length()=" + s.length() + 
 //				", s=" + s +

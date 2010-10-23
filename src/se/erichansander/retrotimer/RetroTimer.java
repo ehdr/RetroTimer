@@ -19,7 +19,9 @@
 
 package se.erichansander.retrotimer;
 
-//TODO: clean out all logging before publication
+//TODO: show timer icon in status bar when alarm is active?
+//TODO: add support for flinging the timer dial
+//TODO: handle _TIME_CHANGED and _TIMEZONE_CHANGED(?)
 //TODO: handle different screen orientations
 //TODO: handle different screen sizes
 
@@ -35,7 +37,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.text.format.DateFormat;
-import android.util.Log;
 
 /**
  * Main application class. Handles state shared between activities,
@@ -43,11 +44,12 @@ import android.util.Log;
  */
 public class RetroTimer extends Application {
 	
-	private static final String DEBUG_TAG = "RetroTimer";
+	public static final String DEBUG_TAG = "RetroTimer";
+	public static final boolean DEBUG = false;
 
 	/**
 	 * When broadcasted, will cause the alarm to sound/vibrate and
-	 * put up a notification, that when clicked dismisses the alarm
+	 * issue a notification, that will dismiss the alarm when clicked.
 	 */
 	public static final String ALARM_TRIGGER_ACTION =
 			"se.erichansander.retrotimer.ALARM_TRIGGER";
@@ -64,7 +66,7 @@ public class RetroTimer extends Application {
 	public static final String ALARM_SILENCE_ACTION =
 			"se.erichansander.retrotimer.ALARM_SILENCE";
 	/** 
-	 * When broadcasted, will silence alarm and remove any notifications
+	 * When broadcasted, will silence alarm and remove any notifications.
 	 */
 	public static final String ALARM_DISMISS_ACTION =
 			"se.erichansander.retrotimer.ALARM_DISMISS";
@@ -87,15 +89,14 @@ public class RetroTimer extends Application {
 	public static final String PREF_VIBRATE_ON_ALARM =
 			"prefs.vibrate_on_alarm";
 	/** Is true if the licensing dialog has been shown (when the app
-	 * was started for the first time).
-	 */
+	 * was started for the first time). */
 	public static final String PREF_HAVE_SHOWN_LICENSE =
 			"prefs.have_shown_license";
 
 	
 	/**
-	 * Initializes the app state, and initializes the AlarmManager is 
-	 * any alarms are pending.
+	 * Initializes the app state, and initializes the AlarmManager if 
+	 * any alarms are pending from before the device was rebooted.
 	 * 
 	 * Should be called at device boot and at application start (in 
 	 * case the app has been killed).
@@ -104,10 +105,14 @@ public class RetroTimer extends Application {
         SharedPreferences prefs = 
         	PreferenceManager.getDefaultSharedPreferences(context);
 
-        if (prefs.getBoolean(PREF_ALARM_SET, false)) {
+        if (prefs.getBoolean(PREF_ALARM_SET, false) ||
+        		prefs.getLong(PREF_ALARM_TIME, 0) > 0) {
         	if (getMillisLeftToAlarm(context) > 1000) {
+        		/* If there is time left until the alarm should trigger,
+            	 * we register it again with the AlarmManager */
         		setAlarmAt(context, prefs.getLong(PREF_ALARM_TIME, 0));
         	} else {
+        		/* Otherwise, we do some clean-up */
             	SharedPreferences.Editor ed = prefs.edit();
                 ed.putLong(RetroTimer.PREF_ALARM_TIME, 0);
         		ed.putBoolean(RetroTimer.PREF_ALARM_SET, false);
@@ -117,7 +122,8 @@ public class RetroTimer extends Application {
 	}
 	
 	/**
-	 * Convenience method for setting an alarm in millisLeft millis.
+	 * Convenience method for setting an alarm to trigger in
+	 * millisLeft millis.
 	 */
     public static void setAlarmDelayed(Context context, long millisLeft) {
     	setAlarmAt(context, System.currentTimeMillis() + millisLeft);    	
@@ -127,7 +133,7 @@ public class RetroTimer extends Application {
      * Sets an alarm at absolute time alarmTime (in millis from epoch)
      */
     public static void setAlarmAt(Context context, long alarmTime) {
-    	Log.v(DEBUG_TAG, "RetroTimer alarm set for " +
+    	Elog.d(DEBUG_TAG, "RetroTimer alarm set for " +
     			DateFormat.format("hh:mm:ss", alarmTime) +
     			" (now is " +
     			DateFormat.format("hh:mm:ss", System.currentTimeMillis()) +
@@ -147,8 +153,6 @@ public class RetroTimer extends Application {
 
         ed.putLong(RetroTimer.PREF_ALARM_TIME, alarmTime);
         am.set(AlarmManager.RTC_WAKEUP, alarmTime, sender);
-
-//      TODO: show timer icon in status bar
 
     	ed.putBoolean(RetroTimer.PREF_ALARM_SET, true);
     	ed.commit();
@@ -177,7 +181,6 @@ public class RetroTimer extends Application {
         SharedPreferences prefs = 
         	PreferenceManager.getDefaultSharedPreferences(context);
     	if (prefs.getBoolean(RetroTimer.PREF_ALARM_SET, false)) {
-//  		TODO: assert mAlarmTime > curr time?
     		return prefs.getLong(RetroTimer.PREF_ALARM_TIME, 0)
     				- System.currentTimeMillis();
     	} else {

@@ -33,7 +33,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Vibrator;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -45,7 +44,7 @@ public class TimerSet extends Activity implements TimerSetListener {
 
 	private static final String DEBUG_TAG = "TimerSet";
 	
-	// Identifier for the dialog displaying the program's license
+	// Identifier for the dialog displaying the license notice
 	private static final int DIALOG_LICENSE_ID = 1;
 
     // How long to vibrate when timer dial goes to zero
@@ -65,8 +64,7 @@ public class TimerSet extends Activity implements TimerSetListener {
     	@Override
     	public void onReceive(Context context, Intent intent) {
     		/* This runs on the minute, but we delay the actual update
-    		 * to the same offset from the whole minute as the alarm time
-    		 */
+    		 * to the same offset from the whole minute as the alarm time */
     		long minOffset = 0;
 
         	if (mPrefs.getBoolean(RetroTimer.PREF_ALARM_SET, false)) {
@@ -125,11 +123,12 @@ public class TimerSet extends Activity implements TimerSetListener {
         /* install intent receiver for the events we need to update 
          * timer view */
         IntentFilter filter = new IntentFilter();
-        filter.addAction(Intent.ACTION_TIME_TICK); // the passage of time
-//      TODO: need special handling of _TIME_CHANGED and 
-//		  _TIMEZONE_CHANGED eventually
-        filter.addAction(Intent.ACTION_TIME_CHANGED); // new system time set
-        filter.addAction(Intent.ACTION_TIMEZONE_CHANGED); // system timezone changed
+        // the passage of time
+        filter.addAction(Intent.ACTION_TIME_TICK);
+        // new system time set
+        filter.addAction(Intent.ACTION_TIME_CHANGED);
+        // system timezone changed
+        filter.addAction(Intent.ACTION_TIMEZONE_CHANGED);
         registerReceiver(mTickReceiver, filter);
 
         if (RetroTimer.getMillisLeftToAlarm(this) <= 0) {
@@ -155,6 +154,11 @@ public class TimerSet extends Activity implements TimerSetListener {
         if (!mPrefs.getBoolean(RetroTimer.PREF_HAVE_SHOWN_LICENSE,
         		false)) {
         	showDialog(DIALOG_LICENSE_ID);
+
+        	// remember that we have showed the license
+			SharedPreferences.Editor ed = mPrefs.edit();
+			ed.putBoolean(RetroTimer.PREF_HAVE_SHOWN_LICENSE, true);
+			ed.commit();
         }
 	}
 
@@ -162,7 +166,7 @@ public class TimerSet extends Activity implements TimerSetListener {
 	protected void onStop() {
 		super.onStop();
 
-		/* stop updating clock when we are no longer running */
+		/* stop updating clock when we are no longer visible */
 		unregisterReceiver(mTickReceiver);
 	}
 	
@@ -171,8 +175,7 @@ public class TimerSet extends Activity implements TimerSetListener {
 		Dialog dialog;
 
 		switch (id) {
-		/* Display a dialog, showing the GNU GPL license notice the
-		 * first time the app is launched. */
+		/* Display a dialog showing the license notice */
 		case DIALOG_LICENSE_ID:
 			// use a custom View to get clickable links in the dialog
 			View view = View.inflate(this, R.layout.license_notice, null);
@@ -184,16 +187,10 @@ public class TimerSet extends Activity implements TimerSetListener {
 							R.string.license_notice_button,
 							null);
 			dialog = builder.create();
-
-			// remember that we have showed the license
-			SharedPreferences.Editor ed = mPrefs.edit();
-			ed.putBoolean(RetroTimer.PREF_HAVE_SHOWN_LICENSE, 
-					true);
-			ed.commit();
 			break;
 
 		default:
-			Log.w(DEBUG_TAG, "Unknown dialog ID in onCreateDialog()");
+			Elog.w(DEBUG_TAG, "Unknown dialog ID in onCreateDialog()");
 			return null;
 		}
 		
@@ -250,7 +247,7 @@ public class TimerSet extends Activity implements TimerSetListener {
 			  return true;
 
 		  default:
-			  Log.w(DEBUG_TAG, "Unknown selection from options menu!");
+			  Elog.w(DEBUG_TAG, "Unknown selection from options menu!");
 			  return super.onOptionsItemSelected(item);
 		}
 	}
@@ -304,10 +301,10 @@ public class TimerSet extends Activity implements TimerSetListener {
 	 * turned all the way down to zero.
 	 * 
 	 * This method is called when the user is in the process of turning
-	 * the dial, before releasing it (which sets it).
+	 * the dial, before releasing it (which sets a new alarm).
 	 */
 	public void onTimerTempValue(long millisLeft) {
-//    	Log.d(DEBUG_TAG, "onTimerTempValue(millisLeft=" + millisLeft + ")");
+//    	Elog.v(DEBUG_TAG, "onTimerTempValue(millisLeft=" + millisLeft + ")");
 
     	if (mPrefs.getBoolean(RetroTimer.PREF_ALARM_SET, true)) {
     		RetroTimer.cancelAlarm(this);
@@ -335,7 +332,7 @@ public class TimerSet extends Activity implements TimerSetListener {
 	 * If at zero, cancels the alarm instead. 
 	 */
     public void onTimerSetValue (long millisLeft) {
-    	Log.d(DEBUG_TAG, "onTimerSetValue(millisLeft=" + millisLeft + ")");
+//    	Elog.d(DEBUG_TAG, "onTimerSetValue(millisLeft=" + millisLeft + ")");
 
     	if (millisLeft > 0) {
     		RetroTimer.setAlarmDelayed(this, millisLeft);
