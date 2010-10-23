@@ -151,6 +151,7 @@ public class TimerSet extends Activity implements TimerSetListener {
         Intent intent = new Intent(RetroTimer.ALARM_DISMISS_ACTION);
         sendBroadcast(intent);
 
+        /* Only show the license notice if we haven't already */
         if (!mPrefs.getBoolean(RetroTimer.PREF_HAVE_SHOWN_LICENSE,
         		false)) {
         	showDialog(DIALOG_LICENSE_ID);

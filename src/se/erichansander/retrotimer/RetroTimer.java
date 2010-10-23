@@ -19,7 +19,6 @@
 
 package se.erichansander.retrotimer;
 
-//TODO: show a licensing splash screen on first app start?
 //TODO: clean out all logging before publication
 //TODO: handle different screen orientations
 //TODO: handle different screen sizes

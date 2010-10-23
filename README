@@ -10,4 +10,11 @@ won't distract you from what you are trying to get done. Your
 only options are to toggle the ringer and vibrator, so you can
 use it e.g. in an open office environment.
 
+The application includes code from the DeskClock application
+that is included with the Android operating system. Therefore,
+some parts of the code are licensed under the Apache Software
+License. Both the Apache License and the GNU General Public
+License are included, in the files NOTICE-ASL and COPYING-GPL,
+respectively.
+
 For more information, see: http://github.com/ehdr/RetroTimer
