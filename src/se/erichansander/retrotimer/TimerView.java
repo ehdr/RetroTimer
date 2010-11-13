@@ -68,7 +68,6 @@ public class TimerView extends ImageView {
 	@Override
 	public void  onSizeChanged  (int intw, int inth, int oldw, int oldh) {
 		mDensityScale = getResources().getDisplayMetrics().density;
-		Elog.d(DEBUG_TAG, "mDensityScale=" + mDensityScale);
 		
 		// set the color and font size for the scale
 		mScalePaint.setTextSize(32*mDensityScale);
@@ -77,7 +76,6 @@ public class TimerView extends ImageView {
 		float widths[] = new float[1];
 		mScalePaint.getTextWidths("...", 0, 1, widths);
 		mLetterWidth = widths[0];
-		Elog.d(DEBUG_TAG, "mLetterWidth=" + mLetterWidth);
 
 		// create a curved path for drawing the text scale on
 		mScalePath = new Path();
@@ -97,9 +95,6 @@ public class TimerView extends ImageView {
 				150, -120);
 
 		mPathLen = (new PathMeasure(mScalePath, false)).getLength();
-		Elog.d(DEBUG_TAG, 
-				"view h=" + h + ", w=" + w + 
-				", mPathLen=" + mPathLen);
 		
 		mLettersInScale = 
 				(int) Math.round(mPathLen / mLetterWidth);
@@ -107,9 +102,17 @@ public class TimerView extends ImageView {
 		mScaleStartOffset =
 			(mPathLen - mLetterWidth * mLettersInScale) / 2
 			- mLetterWidth / (12*mDensityScale);
-		Elog.d(DEBUG_TAG,
-				"mLettersInScale=" + mLettersInScale +
-				", mScaleStartOffset=" + mScaleStartOffset);
+
+		if (RetroTimer.DEBUG) {
+			Elog.d(DEBUG_TAG,
+					"mLettersInScale=" + mLettersInScale +
+					", mScaleStartOffset=" + mScaleStartOffset);
+			Elog.d(DEBUG_TAG, "mDensityScale=" + mDensityScale);
+			Elog.d(DEBUG_TAG, "mLetterWidth=" + mLetterWidth);
+			Elog.d(DEBUG_TAG, 
+					"view h=" + h + ", w=" + w + 
+					", mPathLen=" + mPathLen);
+		}
 	}
 
 	/** Sets the amount of millis left to zero, and redraws the timer */
@@ -154,8 +157,10 @@ public class TimerView extends ImageView {
 			s.append(".");
 		}
 		
-//		Elog.v(DEBUG_TAG, "bef=" + bef + ",aft=" + aft +
-//				", s=" + s);
+//		if (RetroTimer.DEBUG) {
+//			Elog.v(DEBUG_TAG, "bef=" + bef + ",aft=" + aft +
+//			        ", s=" + s);
+//		}
 
 		/* work our way outward, in both the positive and negative
 		 * directions from centerMinute */
@@ -184,18 +189,22 @@ public class TimerView extends ImageView {
 			}
 			aft++;
 			
-//			Elog.v(DEBUG_TAG, "i=" + i +
-//					",bef=" + bef + ",aft=" + aft +
-//					", s=" + s);
+//			if (RetroTimer.DEBUG) {
+//				Elog.v(DEBUG_TAG, "i=" + i +
+//						",bef=" + bef + ",aft=" + aft +
+//						", s=" + s);
+//			}
 		}
 		
-//		Elog.v(DEBUG_TAG, "c=" + centerMinute + 
-//				",bef=" + bef + ",aft=" + aft + 
-//				",s.length()=" + s.length() + 
-//				", s=" + s +
-//				", s.substr=" + 
-//				s.substring(bef - length/2, 
-//						bef - length/2 + length));
+//		if (RetroTimer.DEBUG) {
+//			Elog.v(DEBUG_TAG, "c=" + centerMinute + 
+//					",bef=" + bef + ",aft=" + aft + 
+//					",s.length()=" + s.length() + 
+//					", s=" + s +
+//					", s.substr=" + 
+//					s.substring(bef - length/2, 
+//							bef - length/2 + length));
+//		}
 
 		/* since the two-digit numbers (10, 15...) may have caused 
 		 * the centerMinute not to be precisely in the middle, we

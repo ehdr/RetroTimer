@@ -60,9 +60,11 @@ public class TimerSetView extends TimerView {
 		float w = this.getWidth()*scale;
 		dx *= scale;
 
-//		Elog.v(DEBUG_TAG, 
-//				"onTurn(dx=" + dx + "), mBeingChanged=" + mBeingChanged);
-//		Elog.v(DEBUG_TAG, "getWidth()=" + w);
+//		if (RetroTimer.DEBUG) {
+//			Elog.v(DEBUG_TAG, 
+//					"onTurn(dx=" + dx + "), mBeingChanged=" + mBeingChanged);
+//			Elog.v(DEBUG_TAG, "getWidth()=" + w);
+//		}
 
 		if (mBeingChanged == false) {
 			mMillisLeftBefore = mMillisLeft;
@@ -123,7 +125,9 @@ public class TimerSetView extends TimerView {
 		@Override
 		public boolean onFling(MotionEvent e1, MotionEvent e2,
 				final float velocityX, final float velocityY) {
-//			Elog.v(DEBUG_TAG, "onFling");
+//			if (RetroTimer.DEBUG) {
+//				Elog.v(DEBUG_TAG, "onFling");
+//			}
 //			TODO: call callback for flinging
 			return true;
 		}
@@ -131,7 +135,9 @@ public class TimerSetView extends TimerView {
 		@Override
         public boolean onScroll(MotionEvent e1, MotionEvent e2,
                 float distanceX, float distanceY) {
-//			Elog.v(DEBUG_TAG, "onScroll");
+//			if (RetroTimer.DEBUG) {
+//				Elog.v(DEBUG_TAG, "onScroll");
+//			}
 			mView.onTurn(e2.getX() - e1.getX());
             return true;
 		}

@@ -64,11 +64,6 @@ public class AlarmReceiver extends BroadcastReceiver {
         is probably the result of a time or timezone change */
     private final static int STALE_WINDOW = 60 * 30;
     
-    /** Just a dummy ID for the NotificationManager. We only ever 
-     * show one type of notification at the time, so it doesn't 
-     * really matter. */
-    private final static int ALARM_ID = 0;
-
     private SharedPreferences mPrefs;
 
     @Override
@@ -135,21 +130,20 @@ public class AlarmReceiver extends BroadcastReceiver {
         context.startService(playAlarm);
         
         // Update the shared state
-        SharedPreferences.Editor editor = mPrefs.edit();
-        editor.putBoolean(RetroTimer.PREF_ALARM_SET, false);
-        editor.putLong(RetroTimer.PREF_ALARM_TIME, 0);
-        editor.commit();
+        RetroTimer.clearAlarm(context);
 
         // Trigger a notification that, when clicked, will dismiss the alarm.
         Intent notify = new Intent(RetroTimer.ALARM_DISMISS_ACTION);
         PendingIntent pendingNotify =
         		PendingIntent.getBroadcast(context, 0, notify, 0);
 
-        String label = context.getString(R.string.app_name);
-        Notification n = new Notification(R.drawable.ic_stat_notify,
-                label, alarmTime);
+        String label = 
+        		context.getString(R.string.notify_triggered_label);
+        Notification n = 
+        		new Notification(R.drawable.ic_stat_alarm_triggered,
+        				label, alarmTime);
         n.setLatestEventInfo(context, label,
-        		context.getString(R.string.notify_triggered),
+        		context.getString(R.string.notify_triggered_text),
                 pendingNotify);
         n.flags |= Notification.FLAG_SHOW_LIGHTS
                 | Notification.FLAG_ONGOING_EVENT
@@ -160,7 +154,8 @@ public class AlarmReceiver extends BroadcastReceiver {
          * correct notification. */
         NotificationManager nm = (NotificationManager)
         		context.getSystemService(Context.NOTIFICATION_SERVICE);
-        nm.notify(ALARM_ID, n);
+        nm.cancel(RetroTimer.NOTIF_SET_ID);
+        nm.notify(RetroTimer.NOTIF_TRIGGERED_ID, n);
 	}
 
 	/**
@@ -182,23 +177,26 @@ public class AlarmReceiver extends BroadcastReceiver {
 
         // Launch the TimerSet activity when clicked
         Intent viewAlarm = new Intent(context, TimerSet.class);
+        viewAlarm.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         PendingIntent intent =
                 PendingIntent.getActivity(context, 0, viewAlarm, 0);
 
         // Update the notification to indicate that the alert has been
         // silenced.
-        String label = context.getString(R.string.app_name);
-        Notification n = new Notification(R.drawable.ic_stat_notify,
-                label, alarmTime);
+        String label = 
+        		context.getString(R.string.notify_silenced_label);
+        Notification n =
+        		new Notification(R.drawable.ic_stat_alarm_triggered,
+        				label, alarmTime);
         n.setLatestEventInfo(context, label,
-                context.getString(R.string.notify_silenced),
+                context.getString(R.string.notify_silenced_text),
                 intent);
         n.flags |= Notification.FLAG_AUTO_CANCEL;
         // We have to cancel the original notification since it is in the
         // ongoing section and we want the "killed" notification to be a plain
         // notification.
-        nm.cancel(ALARM_ID);
-        nm.notify(ALARM_ID, n);
+        nm.cancel(RetroTimer.NOTIF_TRIGGERED_ID);
+        nm.notify(RetroTimer.NOTIF_TRIGGERED_ID, n);
     }
 
     /**
@@ -215,6 +213,6 @@ public class AlarmReceiver extends BroadcastReceiver {
     	// Cancel the notification
         NotificationManager nm = (NotificationManager)
         		context.getSystemService(Context.NOTIFICATION_SERVICE);
-        nm.cancel(ALARM_ID);
+        nm.cancel(RetroTimer.NOTIF_TRIGGERED_ID);
     }
 }

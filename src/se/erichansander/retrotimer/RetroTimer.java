@@ -19,9 +19,11 @@
 
 package se.erichansander.retrotimer;
 
-//TODO: show timer icon in status bar when alarm is active?
+//TODO: add instrumentation
+//TODO: add test
+//TODO: optimize string creation
 //TODO: add support for flinging the timer dial
-//TODO: handle _TIME_CHANGED and _TIMEZONE_CHANGED(?)
+//TODO: handle ACTION_TIME_CHANGED and _TIMEZONE_CHANGED
 //TODO: handle different screen orientations
 //TODO: handle different screen sizes
 
@@ -31,6 +33,8 @@ package se.erichansander.retrotimer;
 
 import android.app.AlarmManager;
 import android.app.Application;
+import android.app.Notification;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
@@ -45,7 +49,7 @@ import android.text.format.DateFormat;
 public class RetroTimer extends Application {
 	
 	public static final String DEBUG_TAG = "RetroTimer";
-	public static final boolean DEBUG = false;
+	public static final boolean DEBUG = true;
 
 	/**
 	 * When broadcasted, will cause the alarm to sound/vibrate and
@@ -93,6 +97,12 @@ public class RetroTimer extends Application {
 	public static final String PREF_HAVE_SHOWN_LICENSE =
 			"prefs.have_shown_license";
 
+    /** Notification ID for messages about pending alarms */
+    public static final int NOTIF_SET_ID = 0;
+    /** Notification ID for messages about triggering or 
+     * triggered alarms */
+    public static final int NOTIF_TRIGGERED_ID = 1;
+
 	
 	/**
 	 * Initializes the app state, and initializes the AlarmManager if 
@@ -113,11 +123,8 @@ public class RetroTimer extends Application {
         		setAlarmAt(context, prefs.getLong(PREF_ALARM_TIME, 0));
         	} else {
         		/* Otherwise, we do some clean-up */
-            	SharedPreferences.Editor ed = prefs.edit();
-                ed.putLong(RetroTimer.PREF_ALARM_TIME, 0);
-        		ed.putBoolean(RetroTimer.PREF_ALARM_SET, false);
-        		ed.commit();
-        	}        	
+        		clearAlarm(context);
+        	}
         }
 	}
 	
@@ -133,16 +140,21 @@ public class RetroTimer extends Application {
      * Sets an alarm at absolute time alarmTime (in millis from epoch)
      */
     public static void setAlarmAt(Context context, long alarmTime) {
-    	Elog.d(DEBUG_TAG, "RetroTimer alarm set for " +
-    			DateFormat.format("hh:mm:ss", alarmTime) +
-    			" (now is " +
-    			DateFormat.format("hh:mm:ss", System.currentTimeMillis()) +
-    			")");
+    	if (RetroTimer.DEBUG) {
+    		Elog.d(DEBUG_TAG, "RetroTimer alarm set for " +
+    				DateFormat.format("hh:mm:ss", alarmTime) +
+    				" (now is " +
+    				DateFormat.format("hh:mm:ss", System.currentTimeMillis()) +
+    				")");
+    	}
 
         SharedPreferences prefs = 
         	PreferenceManager.getDefaultSharedPreferences(context);
     	SharedPreferences.Editor ed = prefs.edit();
-    	
+        ed.putLong(RetroTimer.PREF_ALARM_TIME, alarmTime);
+    	ed.putBoolean(RetroTimer.PREF_ALARM_SET, true);
+    	ed.commit();
+
     	AlarmManager am = (AlarmManager)
         	context.getSystemService(Context.ALARM_SERVICE);
 
@@ -151,19 +163,36 @@ public class RetroTimer extends Application {
         PendingIntent sender = PendingIntent.getBroadcast(
                 context, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
 
-        ed.putLong(RetroTimer.PREF_ALARM_TIME, alarmTime);
         am.set(AlarmManager.RTC_WAKEUP, alarmTime, sender);
 
-    	ed.putBoolean(RetroTimer.PREF_ALARM_SET, true);
-    	ed.commit();
+        // Trigger a notification that, when clicked, will open TimerSet
+        Intent viewAlarm = new Intent(context, TimerSet.class);
+        viewAlarm.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        PendingIntent pendingNotify =
+                PendingIntent.getActivity(context, 0, viewAlarm, 0);
+
+        String label = context.getString(R.string.notify_set_label);
+        Notification n =
+        		new Notification(R.drawable.ic_stat_alarm_set,
+        				label, System.currentTimeMillis());
+        n.setLatestEventInfo(context, label,
+        		context.getString(R.string.notify_set_text,
+        				DateFormat.getTimeFormat(context).
+        						format(alarmTime)),
+                pendingNotify);
+        n.flags |= Notification.FLAG_ONGOING_EVENT
+                | Notification.FLAG_NO_CLEAR;
+
+        /* Send the notification using the alarm id to easily identify the
+         * correct notification. */
+        NotificationManager nm = (NotificationManager)
+        		context.getSystemService(Context.NOTIFICATION_SERVICE);
+        nm.notify(RetroTimer.NOTIF_SET_ID, n);
     }
 
     /** Cancels the alarm in the AlarmManager and updates app state */
     public static void cancelAlarm(Context context) {
-        SharedPreferences prefs = 
-        	PreferenceManager.getDefaultSharedPreferences(context);
-    	SharedPreferences.Editor ed = prefs.edit();
-
+    	// Cancel the alarm in AlarmManager
 		AlarmManager am = (AlarmManager)
 				context.getSystemService(Context.ALARM_SERVICE);
 		PendingIntent sender = PendingIntent.getBroadcast(
@@ -171,6 +200,25 @@ public class RetroTimer extends Application {
 				PendingIntent.FLAG_CANCEL_CURRENT);
 		am.cancel(sender);
 
+    	// Cancel the notification
+        NotificationManager nm = (NotificationManager)
+        		context.getSystemService(Context.NOTIFICATION_SERVICE);
+        nm.cancel(RetroTimer.NOTIF_SET_ID);
+
+        clearAlarm(context);
+    }
+
+    /** Clears the shared information about the alarm.
+     * 
+     * Can be called either after the alarm has been cancelled, or 
+     * after it has triggered. 
+     */
+    public static void clearAlarm(Context context) {
+        SharedPreferences prefs = 
+        	PreferenceManager.getDefaultSharedPreferences(context);
+    	SharedPreferences.Editor ed = prefs.edit();
+    	
+        // Update the shared state
         ed.putLong(RetroTimer.PREF_ALARM_TIME, 0);
 		ed.putBoolean(RetroTimer.PREF_ALARM_SET, false);
     	ed.commit();
@@ -183,6 +231,18 @@ public class RetroTimer extends Application {
     	if (prefs.getBoolean(RetroTimer.PREF_ALARM_SET, false)) {
     		return prefs.getLong(RetroTimer.PREF_ALARM_TIME, 0)
     				- System.currentTimeMillis();
+    	} else {
+    		return 0;
+    	}
+    }
+
+    /** Returns the absolute time when alarm will trigger, in millis 
+     * since epoch */
+    public static long getAlarmTime(Context context) {
+        SharedPreferences prefs = 
+        	PreferenceManager.getDefaultSharedPreferences(context);
+    	if (prefs.getBoolean(RetroTimer.PREF_ALARM_SET, false)) {
+    		return prefs.getLong(RetroTimer.PREF_ALARM_TIME, 0);
     	} else {
     		return 0;
     	}

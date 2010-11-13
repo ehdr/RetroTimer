@@ -23,10 +23,8 @@ import se.erichansander.retrotimer.TimerSetView.TimerSetListener;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
@@ -43,11 +41,17 @@ import android.widget.Toast;
 public class TimerSet extends Activity implements TimerSetListener {
 
 	private static final String DEBUG_TAG = "TimerSet";
-	
+
 	// Identifier for the dialog displaying the license notice
 	private static final int DIALOG_LICENSE_ID = 1;
 
+	// Interval between redraws of the timer to update time left
+	private static final int UPDATE_INTERVAL_MILLIS = 60*1000;
+
     // How long to vibrate when timer dial goes to zero
+	private final long mSetAlarmDelayMillis = 750;
+
+	// How long to vibrate when timer dial goes to zero
     private final long mZeroVibrateDurationMillis = 200;
 
     // Handles to stuff we need to interact with
@@ -55,51 +59,44 @@ public class TimerSet extends Activity implements TimerSetListener {
     private Vibrator mVibrator;
 	private TimerSetView mTimer;
 
-	// True when timer dial has is at zero
+	// True when timer dial is at zero
 	private boolean mTempAtZero = false;
+	/* Time left (in millis) that the alarm will be set for, when
+	 * the delaySetAlarm is triggered */
+	private long mTimeLeftToBeSet = 0;
 
 	// Handler for updating the TimerView with time remaining
 	private final Handler mHandler = new Handler();
-    private final BroadcastReceiver mTickReceiver = new BroadcastReceiver() {    	
-    	@Override
-    	public void onReceive(Context context, Intent intent) {
-    		/* This runs on the minute, but we delay the actual update
-    		 * to the same offset from the whole minute as the alarm time */
-    		long minOffset = 0;
+	private final Runnable runTimeUpdate = new Runnable() {
+		public void run() {
+			mHandler.postDelayed(this, UPDATE_INTERVAL_MILLIS);
+//	    	if (RetroTimer.DEBUG) {
+//	    		Elog.d(DEBUG_TAG, "runTimeUpdate at " + 
+//	    				DateFormat.format("hh:mm:ss", 
+//	    						System.currentTimeMillis()));
+//	    	}
+			updateTimeLeft();
+		}
+	};
+	private final Runnable delaySetAlarm = new Runnable() {
+		public void run() {
+//	    	if (RetroTimer.DEBUG) {
+//	    		Elog.d(DEBUG_TAG, "delaySetAlarm at " + 
+//	    				DateFormat.format("hh:mm:ss", 
+//	    						System.currentTimeMillis()));
+//	    	}
 
-        	if (mPrefs.getBoolean(RetroTimer.PREF_ALARM_SET, false)) {
-        		minOffset = 
-        				mPrefs.getLong(RetroTimer.PREF_ALARM_TIME, 0) % 60000
-        				- 1000;
-        		if (minOffset < 0) {
-        			minOffset += 60000;
-        			
-        			// Update right away as well, to get the start value right
-                	mHandler.post(new Runnable() {
-                		public void run() {
-                			updateTimeLeft();
-                		}
-                	});
-        		}
-        	}
-        	
-    		// Post a runnable to avoid blocking the broadcast
-        	mHandler.postDelayed(new Runnable() {
-    			public void run() {
-    		    	updateTimeLeft();
-    			}
-        	}, minOffset);
-    	}
-    };
-
-	private void updateTimeLeft() {
-		long millisLeft = RetroTimer.getMillisLeftToAlarm(this);
-		updateTimeLeft(millisLeft);
-	}
-
-	private void updateTimeLeft(long millisLeft) {
-		mTimer.setMillisLeft(millisLeft);
-	}
+	    	if (mTimeLeftToBeSet > 0) {
+	    		RetroTimer.setAlarmDelayed(
+	    				TimerSet.this, 
+	    				mTimeLeftToBeSet);
+	    		startUpdatingTimeLeft();
+	    	} else {
+	    		RetroTimer.cancelAlarm(TimerSet.this);
+	    		updateTimeLeft();
+	    	}
+		}
+	};
 
     @Override
     public void onCreate(Bundle icicle) {
@@ -120,21 +117,12 @@ public class TimerSet extends Activity implements TimerSetListener {
     protected void onStart() {
         super.onStart();
 
-        /* install intent receiver for the events we need to update 
-         * timer view */
-        IntentFilter filter = new IntentFilter();
-        // the passage of time
-        filter.addAction(Intent.ACTION_TIME_TICK);
-        // new system time set
-        filter.addAction(Intent.ACTION_TIME_CHANGED);
-        // system timezone changed
-        filter.addAction(Intent.ACTION_TIMEZONE_CHANGED);
-        registerReceiver(mTickReceiver, filter);
-
-        if (RetroTimer.getMillisLeftToAlarm(this) <= 0) {
+        if (RetroTimer.getMillisLeftToAlarm(this) > 0) {
+        	startUpdatingTimeLeft();
+        } else {
     		mTempAtZero = true;
+    		updateTimeLeft();
     	}
-        updateTimeLeft();
 	}
 	
 	@Override
@@ -166,8 +154,8 @@ public class TimerSet extends Activity implements TimerSetListener {
 	protected void onStop() {
 		super.onStop();
 
-		/* stop updating clock when we are no longer visible */
-		unregisterReceiver(mTickReceiver);
+		// stop updating the display
+		mHandler.removeCallbacks(runTimeUpdate);
 	}
 	
 	@Override
@@ -292,7 +280,49 @@ public class TimerSet extends Activity implements TimerSetListener {
 							R.string.vibrate_on_alarm_turned_off), 
 							Toast.LENGTH_SHORT).show();
 		}
-	}	
+	}
+	
+	private void startUpdatingTimeLeft() {
+		long alarmTime = RetroTimer.getAlarmTime(this);
+		long delay;
+
+//    	if (RetroTimer.DEBUG) {
+//    		Elog.v(DEBUG_TAG, "startUpdatingTimeLeft() at " + 
+//    				DateFormat.format("hh:mm:ss", System.currentTimeMillis()));
+//    	}
+
+		/* calculate how long after a minute tick the alarm will 
+		 * go off */
+		delay = alarmTime % 60000;
+		/* subtract a small amount of time, so the view is updated
+		 * slightly before the alarm triggers */
+		delay -= 500;
+		/*  */
+		delay -= System.currentTimeMillis() % 60000;
+		/* handle the corner case */
+		if (delay < 0) {
+			/* if now is within the first 500 millis of a minute,
+			 * delay will be negative, so we wait a minute before 
+			 * updating */ 
+			delay += 60000;
+		}
+		
+//    	if (RetroTimer.DEBUG) {
+//    		Elog.v(DEBUG_TAG,
+//    				" posting first runTimeUpdate with delay " + delay);
+//    	}
+		mHandler.postDelayed(runTimeUpdate, delay);
+		updateTimeLeft();
+	}
+
+	private void updateTimeLeft() {
+		long millisLeft = RetroTimer.getMillisLeftToAlarm(this);
+		updateTimeLeft(millisLeft);
+	}
+
+	private void updateTimeLeft(long millisLeft) {
+		mTimer.setMillisLeft(millisLeft);
+	}
 
 
 	// Callback functions for the TimerSetView class
@@ -309,12 +339,15 @@ public class TimerSet extends Activity implements TimerSetListener {
     	if (mPrefs.getBoolean(RetroTimer.PREF_ALARM_SET, true)) {
     		RetroTimer.cancelAlarm(this);
     	}
+    	
+    	mHandler.removeCallbacks(runTimeUpdate);
+    	mHandler.removeCallbacks(delaySetAlarm);
 
     	if (millisLeft <= 0) {
     		millisLeft = 0;
     		
-    		// Only vibrate if vibration is turned on, and 
-    		// we are not already at zero
+    		/* Only vibrate if vibration is turned on, and we are not 
+    		 * already at zero */
     		if (mPrefs.getBoolean(RetroTimer.PREF_VIBRATE_ON_ALARM, true) &&
     				!mTempAtZero) {
     			mVibrator.vibrate(mZeroVibrateDurationMillis);
@@ -332,14 +365,19 @@ public class TimerSet extends Activity implements TimerSetListener {
 	 * If at zero, cancels the alarm instead. 
 	 */
     public void onTimerSetValue (long millisLeft) {
-//    	Elog.d(DEBUG_TAG, "onTimerSetValue(millisLeft=" + millisLeft + ")");
-
+//    	if (RetroTimer.DEBUG) {
+//    		Elog.d(DEBUG_TAG, "onTimerSetValue(millisLeft=" + millisLeft +
+//    				") at " + 
+//    				DateFormat.format("hh:mm:ss", 
+//    						System.currentTimeMillis()));
+//    	}
+    	
     	if (millisLeft > 0) {
-    		RetroTimer.setAlarmDelayed(this, millisLeft);
-    	} else {
-    		RetroTimer.cancelAlarm(this);
+    		mTimeLeftToBeSet = millisLeft;
+    		mHandler.removeCallbacks(delaySetAlarm);
+    		mHandler.postDelayed(
+    				delaySetAlarm, 
+    				mSetAlarmDelayMillis);
     	}
-
-    	updateTimeLeft();
     }
 }
