@@ -47,6 +47,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import android.text.format.DateFormat;
 
 /**
  * Glue class. Receives intents:
@@ -141,7 +142,7 @@ public class AlarmReceiver extends BroadcastReceiver {
         		context.getString(R.string.notify_triggered_label);
         Notification n = 
         		new Notification(R.drawable.ic_stat_alarm_triggered,
-        				label, alarmTime);
+        				label, 0);
         n.setLatestEventInfo(context, label,
         		context.getString(R.string.notify_triggered_text),
                 pendingNotify);
@@ -187,9 +188,11 @@ public class AlarmReceiver extends BroadcastReceiver {
         		context.getString(R.string.notify_silenced_label);
         Notification n =
         		new Notification(R.drawable.ic_stat_alarm_triggered,
-        				label, alarmTime);
+        				label, 0);
         n.setLatestEventInfo(context, label,
-                context.getString(R.string.notify_silenced_text),
+                context.getString(R.string.notify_silenced_text,
+                		DateFormat.getTimeFormat(context).
+								format(alarmTime)),
                 intent);
         n.flags |= Notification.FLAG_AUTO_CANCEL;
         // We have to cancel the original notification since it is in the

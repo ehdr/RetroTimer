@@ -168,11 +168,12 @@ public class RetroTimer extends Application {
         String label = context.getString(R.string.notify_set_label);
         Notification n =
         		new Notification(R.drawable.ic_stat_alarm_set,
-        				label, System.currentTimeMillis());
+        				label, 0);
         n.setLatestEventInfo(context, label,
         		context.getString(R.string.notify_set_text,
         				DateFormat.getTimeFormat(context).
-        						format(alarmTime)),
+        						format(alarmTime),
+        				DateFormat.format("ss", alarmTime)),
                 pendingNotify);
         n.flags |= Notification.FLAG_ONGOING_EVENT
                 | Notification.FLAG_NO_CLEAR;
