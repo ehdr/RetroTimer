@@ -22,13 +22,7 @@ package se.erichansander.retrotimer;
 //TODO: add instrumentation
 //TODO: add test
 //TODO: optimize string creation
-//TODO: add support for flinging the timer dial
-//TODO: handle ACTION_TIME_CHANGED and _TIMEZONE_CHANGED
-//TODO: handle different screen orientations
-//TODO: handle different screen sizes
-
 //TODO: animate TimerAlert?
-//TODO: handle setting alarm with the trackball
 
 
 import android.app.AlarmManager;
