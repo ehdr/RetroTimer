@@ -148,6 +148,9 @@ public class TimerSet extends Activity implements TimerSetListener {
 			ed.putBoolean(RetroTimer.PREF_HAVE_SHOWN_LICENSE, true);
 			ed.commit();
         }
+        
+        // Update the time remaining to alarm
+        mTimer.invalidate();
 	}
 
 	@Override
