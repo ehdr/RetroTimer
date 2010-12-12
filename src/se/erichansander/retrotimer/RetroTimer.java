@@ -77,6 +77,9 @@ public class RetroTimer extends Application {
 	/** Is true when an alarm is set */
 	public static final String PREF_ALARM_SET = 
 			"prefs.alarm_set";
+	/** Max num of millis to play alarm before silencing it automatically */
+	public static final String PREF_ALARM_TIMEOUT_MILLIS =
+			"prefs.alarm_timeout_millis";
 	/** Absolute time when alarm should go off, in millis since epoch */ 
 	public static final String PREF_ALARM_TIME = 
 			"prefs.alarm_time";
@@ -127,6 +130,16 @@ public class RetroTimer extends Application {
 	 * millisLeft millis.
 	 */
     public static void setAlarmDelayed(Context context, long millisLeft) {
+        SharedPreferences prefs = 
+        	PreferenceManager.getDefaultSharedPreferences(context);
+    	SharedPreferences.Editor ed = prefs.edit();
+    	/* Set the alarm timeout to 5 + (mins to alarm)/2 seconds, i.e.
+    	 * timeout will be in the range 5..34.5 seconds if the time max
+    	 * countdown is 59 minutes */
+        ed.putLong(RetroTimer.PREF_ALARM_TIMEOUT_MILLIS,
+        		5000 + millisLeft/(60 * 2));
+    	ed.commit();
+
     	setAlarmAt(context, System.currentTimeMillis() + millisLeft);    	
     }
     

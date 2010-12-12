@@ -67,10 +67,6 @@ public class TimerKlaxon extends Service {
 	 * Volume suggested by media team for in-call alarms. */
     private static final float IN_CALL_VOLUME = 0.125f;
 
-    /* Max time to play alarm before silencing */
-    // TODO: put this in SharedPreferences instead.
-    private static final int ALARM_TIMEOUT_SECONDS = 30;
-
     private static final long[] sVibratePattern = new long[] { 500, 500 };
 
     // Handles to stuff we need to interact with
@@ -162,9 +158,11 @@ public class TimerKlaxon extends Service {
         	mPrefs.getBoolean(RetroTimer.PREF_RING_ON_ALARM, true);
         boolean vibrate = 
         	mPrefs.getBoolean(RetroTimer.PREF_VIBRATE_ON_ALARM, true);
+        long timeoutMillis = 
+        	mPrefs.getLong(RetroTimer.PREF_ALARM_TIMEOUT_MILLIS, 10*1000);
     	mAlarmTime = intent.getLongExtra(RetroTimer.ALARM_TIME_EXTRA, 0);
 
-        play(ring, vibrate);
+        play(ring, vibrate, timeoutMillis);
 
         // Record the initial call state here so that the new alarm has the
         // newest state.
@@ -179,7 +177,9 @@ public class TimerKlaxon extends Service {
         sendBroadcast(intent);
     }
 
-    private void play(boolean ring, boolean vibrate) {
+    private void play(boolean ring, 
+    		boolean vibrate, 
+    		long timeoutMillis) {
         // stop() checks to see if we are already playing.
         stop();
 
@@ -223,7 +223,7 @@ public class TimerKlaxon extends Service {
             mVibrator.cancel();
         }
 
-        startTimeoutCountdown();
+        startTimeoutCountdown(timeoutMillis);
         mPlaying = true;
     }
 
@@ -274,12 +274,12 @@ public class TimerKlaxon extends Service {
     }
 
     /**
-     * Kills alarm audio after ALARM_TIMEOUT_SECONDS, so the alarm
+     * Kills alarm audio after timeoutMillis millis, so the alarm
      * won't run all day.
      */
-    private void startTimeoutCountdown() {
+    private void startTimeoutCountdown(long timeoutMillis) {
         mHandler.sendMessageDelayed(mHandler.obtainMessage(TIMEOUT_ID),
-                1000 * ALARM_TIMEOUT_SECONDS);
+                timeoutMillis);
     }
 
     /* Cancels the timeout countdown */
