@@ -7,7 +7,7 @@
 
 	<!-- Notification texts -->
 	<string name="notify_set_label">Retro Timer is set</string>
-	<string name="notify_set_text">Alarm set to trigger at %1$s:%2$s</string>
+	<string name="notify_set_text">Alarm set to trigger at %s (approximately)</string>
 	<string name="notify_triggered_label">Retro Timer alert</string>
 	<string name="notify_triggered_text">Select to dismiss the alarm</string>
 	<string name="notify_silenced_label">Retro Timer silenced</string>

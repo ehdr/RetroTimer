@@ -185,8 +185,7 @@ public class RetroTimer extends Application {
         n.setLatestEventInfo(context, label,
         		context.getString(R.string.notify_set_text,
         				DateFormat.getTimeFormat(context).
-        						format(alarmTime),
-        				DateFormat.format("ss", alarmTime)),
+        						format(alarmTime)),
                 pendingNotify);
         n.flags |= Notification.FLAG_ONGOING_EVENT
                 | Notification.FLAG_NO_CLEAR;
