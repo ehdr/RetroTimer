@@ -45,8 +45,6 @@ import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
 import android.text.format.DateFormat;
 
 /**
@@ -65,12 +63,8 @@ public class AlarmReceiver extends BroadcastReceiver {
         is probably the result of a time or timezone change */
     private final static int STALE_WINDOW = 60 * 30;
     
-    private SharedPreferences mPrefs;
-
     @Override
     public void onReceive(Context context, Intent intent) {
-        mPrefs = PreferenceManager.getDefaultSharedPreferences(context);
-
     	long alarmTime =
     		intent.getLongExtra(RetroTimer.ALARM_TIME_EXTRA, 0);
 

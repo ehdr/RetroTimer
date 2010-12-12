@@ -128,7 +128,6 @@ public class TimerSetView extends TimerView {
 //			if (RetroTimer.DEBUG) {
 //				Elog.v(DEBUG_TAG, "onFling");
 //			}
-//			TODO: call callback for flinging
 			return true;
 		}
 

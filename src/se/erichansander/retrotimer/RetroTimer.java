@@ -21,7 +21,7 @@ package se.erichansander.retrotimer;
 
 //TODO: add instrumentation
 //TODO: add test
-//TODO: optimize string creation
+//TODO: optimize string creation?
 //TODO: animate TimerAlert?
 
 
