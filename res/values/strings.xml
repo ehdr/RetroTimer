@@ -1,17 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Activity names -->
-    <string name="app_name">RetroTimer</string>
+    <string name="app_label">Retro Timer</string>
 
 	<!-- Activity labels -->
-	<string name="timer_alert_label">RetroTimer alert</string>
+	<string name="timer_alert_label">Retro Timer alert</string>
 
 	<!-- Notification texts -->
-	<string name="notify_set_label">RetroTimer is set</string>
+	<string name="notify_set_label">Retro Timer is set</string>
 	<string name="notify_set_text">Alarm set to trigger at %1$s:%2$s</string>
-	<string name="notify_triggered_label">RetroTimer alert</string>
+	<string name="notify_triggered_label">Retro Timer alert</string>
 	<string name="notify_triggered_text">Select to dismiss the alarm</string>
-	<string name="notify_silenced_label">RetroTimer silenced</string>
+	<string name="notify_silenced_label">Retro Timer silenced</string>
 	<string name="notify_silenced_text">Alarm triggered at %s</string>
 
 	<!-- URLs -->
@@ -37,18 +36,18 @@
 	<string name="license_notice_text">
 Copyright (C) 2010  Eric Hansander\n
 \n
-  RetroTimer is free software: you can redistribute it and/or modify
+  Retro Timer is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
   the Free Software Foundation, either version 3 of the License, or
   (at your option) any later version.\n
 \n
-  RetroTimer is distributed in the hope that it will be useful,
+  Retro Timer is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
   GNU General Public License for more details.\n
 \n
   You should have received a copy of the GNU General Public License
-  along with RetroTimer.  If not, see http://www.gnu.org/licenses/.
+  along with Retro Timer.  If not, see http://www.gnu.org/licenses/.
 </string>
 	<string name="license_notice_button">OK</string>
 </resources>
