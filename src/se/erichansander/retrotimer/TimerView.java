@@ -37,8 +37,8 @@ public class TimerView extends ImageView {
 
 	private static final String DEBUG_TAG = "TimerView";
 
-	// TODO: put this in SharedPreferences instead.
-	public static final long TIMER_MAX_MINS = 59;
+	/** The max number of minutes the countdown can be set to */
+	public static final long TIMER_MAX_MINS = 89;
 
 	private Paint mScalePaint;
 	private Path mScalePath;
