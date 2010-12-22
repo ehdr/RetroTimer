@@ -43,7 +43,7 @@ import android.text.format.DateFormat;
 public class RetroTimer extends Application {
 	
 	public static final String DEBUG_TAG = "RetroTimer";
-	public static final boolean DEBUG = true;
+	public static final boolean DEBUG = false;
 
 	/**
 	 * When broadcasted, will cause the alarm to sound/vibrate and

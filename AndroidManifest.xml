@@ -15,9 +15,8 @@
 
     <application android:label="@string/app_label"
 				 android:icon="@drawable/ic_launcher"
-				 android:name=".RetroTimer"
-				 android:debuggable="true"> 
- 
+				 android:name=".RetroTimer"> 
+
         <activity android:name=".TimerSet"
                   android:label="@string/app_label"
                   android:launchMode="singleInstance"
