@@ -45,7 +45,6 @@ public class TimerAlertView extends TimerView implements OnClickListener {
         mListener = listener;
     }
     
-    @Override
     public void onClick(View v) {
 //    	Elog.v(DEBUG_TAG, "onClick");
     	
