@@ -162,7 +162,8 @@ public class TimerKlaxon extends Service {
         	mPrefs.getLong(RetroTimer.PREF_ALARM_TIMEOUT_MILLIS, 10*1000);
     	mAlarmTime = intent.getLongExtra(RetroTimer.ALARM_TIME_EXTRA, 0);
 
-        play(ring, vibrate, timeoutMillis);
+        play(ring, vibrate);
+        startTimeoutCountdown(timeoutMillis);
 
         // Record the initial call state here so that the new alarm has the
         // newest state.
@@ -177,9 +178,7 @@ public class TimerKlaxon extends Service {
         sendBroadcast(intent);
     }
 
-    private void play(boolean ring, 
-    		boolean vibrate, 
-    		long timeoutMillis) {
+    private void play(boolean ring, boolean vibrate) {
         // stop() checks to see if we are already playing.
         stop();
 
@@ -223,7 +222,6 @@ public class TimerKlaxon extends Service {
             mVibrator.cancel();
         }
 
-        startTimeoutCountdown(timeoutMillis);
         mPlaying = true;
     }
 
