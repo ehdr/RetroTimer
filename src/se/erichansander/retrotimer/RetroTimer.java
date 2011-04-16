@@ -137,7 +137,7 @@ public class RetroTimer extends Application {
     	 * timeout will be in the range 5..34.5 seconds if the time max
     	 * countdown is 59 minutes */
         ed.putLong(RetroTimer.PREF_ALARM_TIMEOUT_MILLIS,
-        		5000 + millisLeft/(60 * 2));
+        		15000 + millisLeft/60);
     	ed.commit();
 
     	setAlarmAt(context, System.currentTimeMillis() + millisLeft);    	
