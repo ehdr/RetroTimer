@@ -1,2 +1,3 @@
-bin
-gen/se/erichansander/retrotimer/R.java
+bin/
+gen/
+.settings/
