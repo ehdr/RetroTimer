@@ -1,5 +1,5 @@
-/* 
- * Copyright (C) 2010  Eric Hansander
+/*
+ * Copyright (C) 2010-2011  Eric Hansander
  *
  *  This file is part of Retro Timer.
  *
@@ -16,7 +16,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Retro Timer.  If not, see <http://www.gnu.org/licenses/>.
  *
- * This file incorporates work covered by the following copyright and  
+ * This file incorporates work covered by the following copyright and
  * permission notice:
  *
  *     Copyright (C) 2008 The Android Open Source Project
@@ -42,7 +42,7 @@ import android.os.PowerManager;
 /**
  * Hold a wakelock that can be acquired in the AlarmReceiver and
  * released in the TimerAlert activity.
- * 
+ *
  * This file is borrowed almost without modification from the
  * DeskClock app included with Android.
  */

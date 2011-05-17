@@ -1,5 +1,5 @@
-/* 
- * Copyright (C) 2010  Eric Hansander
+/*
+ * Copyright (C) 2010-2011  Eric Hansander
  *
  *  This file is part of Retro Timer.
  *
@@ -34,11 +34,9 @@ import android.view.WindowManager;
  * Touching it will dismiss the alarm. */
 public class TimerAlert extends Activity implements TimerAlertListener {
 
-	private static final String DEBUG_TAG = "TimerAlert";
-
 	private TimerAlertView mTimer;
 
-	/* Receiver to handle ALARM_SILENCE_ACTION and 
+	/* Receiver to handle ALARM_SILENCE_ACTION and
 	 * ALARM_DISMISS_ACTION intents, by closing this activity */
     private BroadcastReceiver mReceiver = new BroadcastReceiver() {
         @Override
@@ -50,7 +48,7 @@ public class TimerAlert extends Activity implements TimerAlertListener {
     @Override
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
-        
+
         /* Some preparations for handling the situation when the alarm
          * triggers while the phone is locked. */
         final Window win = getWindow();
@@ -71,12 +69,12 @@ public class TimerAlert extends Activity implements TimerAlertListener {
         filter.addAction(RetroTimer.ALARM_SILENCE_ACTION);
         registerReceiver(mReceiver, filter);
     }
-    
+
     @Override
     public void onResume() {
     	super.onResume();
-    	/* When this activity is shown, we know for sure that the 
-    	 * alarm has triggered, i.e. there is zero time left 
+    	/* When this activity is shown, we know for sure that the
+    	 * alarm has triggered, i.e. there is zero time left
     	 * to alarm */
     	mTimer.setMillisLeft(0);
     }
@@ -87,7 +85,7 @@ public class TimerAlert extends Activity implements TimerAlertListener {
 
         unregisterReceiver(mReceiver);
     }
-    
+
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
     	// Do this on key down to handle a few of the system keys.
@@ -110,10 +108,9 @@ public class TimerAlert extends Activity implements TimerAlertListener {
     }
 
     public void onAlertDismissed() {
-    	Elog.v(DEBUG_TAG, "onAlertDismissed()");
     	dismissAlarm();
     }
-    
+
     private void dismissAlarm() {
     	// Broadcast ALARM_DISMISS_ACTION to kill the TimerKlaxon
         Intent intent = new Intent(RetroTimer.ALARM_DISMISS_ACTION);

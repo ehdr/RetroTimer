@@ -1,5 +1,5 @@
-/* 
- * Copyright (C) 2010  Eric Hansander
+/*
+ * Copyright (C) 2010-2011  Eric Hansander
  *
  *  This file is part of Retro Timer.
  *
@@ -41,10 +41,6 @@ import android.text.format.DateFormat;
  * and holds shared constants etc.
  */
 public class RetroTimer extends Application {
-	
-	public static final String DEBUG_TAG = "RetroTimer";
-	public static final boolean DEBUG = false;
-
 	/**
 	 * When broadcasted, will cause the alarm to sound/vibrate and
 	 * issue a notification, that will dismiss the alarm when clicked.
@@ -58,12 +54,12 @@ public class RetroTimer extends Application {
 	public static final String ALARM_PLAY_ACTION =
 			"se.erichansander.retrotimer.ALARM_PLAY";
 	/**
-	 * When broadcasted, will silence alarm and put up a notification 
+	 * When broadcasted, will silence alarm and put up a notification
 	 * stating that the timer has been silenced.
 	 */
 	public static final String ALARM_SILENCE_ACTION =
 			"se.erichansander.retrotimer.ALARM_SILENCE";
-	/** 
+	/**
 	 * When broadcasted, will silence alarm and remove any notifications.
 	 */
 	public static final String ALARM_DISMISS_ACTION =
@@ -72,16 +68,16 @@ public class RetroTimer extends Application {
 
 	/** For passing the alarm time through an intent */
 	public static final String ALARM_TIME_EXTRA = "intent.extra.alarmtime";
-	
+
 
 	/** Is true when an alarm is set */
-	public static final String PREF_ALARM_SET = 
+	public static final String PREF_ALARM_SET =
 			"prefs.alarm_set";
 	/** Max num of millis to play alarm before silencing it automatically */
 	public static final String PREF_ALARM_TIMEOUT_MILLIS =
 			"prefs.alarm_timeout_millis";
-	/** Absolute time when alarm should go off, in millis since epoch */ 
-	public static final String PREF_ALARM_TIME = 
+	/** Absolute time when alarm should go off, in millis since epoch */
+	public static final String PREF_ALARM_TIME =
 			"prefs.alarm_time";
 	/** Is true if alert should play audio */
 	public static final String PREF_RING_ON_ALARM =
@@ -96,20 +92,20 @@ public class RetroTimer extends Application {
 
     /** Notification ID for messages about pending alarms */
     public static final int NOTIF_SET_ID = 0;
-    /** Notification ID for messages about triggering or 
+    /** Notification ID for messages about triggering or
      * triggered alarms */
     public static final int NOTIF_TRIGGERED_ID = 1;
 
-	
+
 	/**
-	 * Initializes the app state, and initializes the AlarmManager if 
+	 * Initializes the app state, and initializes the AlarmManager if
 	 * any alarms are pending from before the device was rebooted.
-	 * 
-	 * Should be called at device boot and at application start (in 
+	 *
+	 * Should be called at device boot and at application start (in
 	 * case the app has been killed).
 	 */
 	public static void initAlarm(Context context) {
-        SharedPreferences prefs = 
+        SharedPreferences prefs =
         	PreferenceManager.getDefaultSharedPreferences(context);
 
         if (prefs.getBoolean(PREF_ALARM_SET, false) ||
@@ -124,13 +120,13 @@ public class RetroTimer extends Application {
         	}
         }
 	}
-	
+
 	/**
 	 * Convenience method for setting an alarm to trigger in
 	 * millisLeft millis.
 	 */
     public static void setAlarmDelayed(Context context, long millisLeft) {
-        SharedPreferences prefs = 
+        SharedPreferences prefs =
         	PreferenceManager.getDefaultSharedPreferences(context);
     	SharedPreferences.Editor ed = prefs.edit();
     	/* Set the alarm timeout to 5 + (mins to alarm)/2 seconds, i.e.
@@ -140,22 +136,14 @@ public class RetroTimer extends Application {
         		15000 + millisLeft/60);
     	ed.commit();
 
-    	setAlarmAt(context, System.currentTimeMillis() + millisLeft);    	
+    	setAlarmAt(context, System.currentTimeMillis() + millisLeft);
     }
-    
+
     /**
      * Sets an alarm at absolute time alarmTime (in millis from epoch)
      */
     public static void setAlarmAt(Context context, long alarmTime) {
-    	if (RetroTimer.DEBUG) {
-    		Elog.d(DEBUG_TAG, "Alarm set to trigger at " +
-    				DateFormat.format("hh:mm:ss", alarmTime) +
-    				" (now is " +
-    				DateFormat.format("hh:mm:ss", System.currentTimeMillis()) +
-    				")");
-    	}
-
-        SharedPreferences prefs = 
+        SharedPreferences prefs =
         	PreferenceManager.getDefaultSharedPreferences(context);
     	SharedPreferences.Editor ed = prefs.edit();
         ed.putLong(RetroTimer.PREF_ALARM_TIME, alarmTime);
@@ -216,15 +204,15 @@ public class RetroTimer extends Application {
     }
 
     /** Clears the shared information about the alarm.
-     * 
-     * Can be called either after the alarm has been cancelled, or 
-     * after it has triggered. 
+     *
+     * Can be called either after the alarm has been cancelled, or
+     * after it has triggered.
      */
     public static void clearAlarm(Context context) {
-        SharedPreferences prefs = 
+        SharedPreferences prefs =
         	PreferenceManager.getDefaultSharedPreferences(context);
     	SharedPreferences.Editor ed = prefs.edit();
-    	
+
         // Update the shared state
         ed.putLong(RetroTimer.PREF_ALARM_TIME, 0);
 		ed.putBoolean(RetroTimer.PREF_ALARM_SET, false);
@@ -233,7 +221,7 @@ public class RetroTimer extends Application {
 
     /** Returns millis left to alarm, or zero if no alarm is set */
     public static long getMillisLeftToAlarm(Context context) {
-        SharedPreferences prefs = 
+        SharedPreferences prefs =
         	PreferenceManager.getDefaultSharedPreferences(context);
     	if (prefs.getBoolean(RetroTimer.PREF_ALARM_SET, false)) {
     		return prefs.getLong(RetroTimer.PREF_ALARM_TIME, 0)
@@ -243,10 +231,10 @@ public class RetroTimer extends Application {
     	}
     }
 
-    /** Returns the absolute time when alarm will trigger, in millis 
+    /** Returns the absolute time when alarm will trigger, in millis
      * since epoch */
     public static long getAlarmTime(Context context) {
-        SharedPreferences prefs = 
+        SharedPreferences prefs =
         	PreferenceManager.getDefaultSharedPreferences(context);
     	if (prefs.getBoolean(RetroTimer.PREF_ALARM_SET, false)) {
     		return prefs.getLong(RetroTimer.PREF_ALARM_TIME, 0);

@@ -1,5 +1,5 @@
-/* 
- * Copyright (C) 2010  Eric Hansander
+/*
+ * Copyright (C) 2010-2011  Eric Hansander
  *
  *  This file is part of Retro Timer.
  *
@@ -16,7 +16,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Retro Timer.  If not, see <http://www.gnu.org/licenses/>.
  *
- * This file incorporates work covered by the following copyright and  
+ * This file incorporates work covered by the following copyright and
  * permission notice:
  *
  *     Copyright (C) 2008 The Android Open Source Project
@@ -61,8 +61,6 @@ import android.telephony.TelephonyManager;
  */
 public class TimerKlaxon extends Service {
 
-	private static final String DEBUG_TAG = "TimerKlaxon";
-
     /* Comment from the DeskClock app:
 	 * Volume suggested by media team for in-call alarms. */
     private static final float IN_CALL_VOLUME = 0.125f;
@@ -82,6 +80,7 @@ public class TimerKlaxon extends Service {
     // Internal messages. Handles alarm timeouts.
     private static final int TIMEOUT_ID = 1000;
     private Handler mHandler = new Handler() {
+        @Override
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 case TIMEOUT_ID:
@@ -92,7 +91,7 @@ public class TimerKlaxon extends Service {
         }
     };
 
-    private PhoneStateListener mPhoneStateListener = 
+    private PhoneStateListener mPhoneStateListener =
     		new PhoneStateListener() {
         @Override
         public void onCallStateChanged(int state, String ignored) {
@@ -113,13 +112,13 @@ public class TimerKlaxon extends Service {
     public void onCreate() {
         mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
         mVibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-        
+
         // Listen for incoming calls to kill the alarm.
         mTelephonyManager =
                 (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
         mTelephonyManager.listen(
                 mPhoneStateListener, PhoneStateListener.LISTEN_CALL_STATE);
-        
+
         WakeLockHolder.acquireCpuWakeLock(this);
     }
 
@@ -144,21 +143,17 @@ public class TimerKlaxon extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-    	Elog.v(DEBUG_TAG, 
-    			"onStartCommand(., flags=" +
-    			flags +", startId=" + startId + ")");
-
         // No intent, tell the system not to restart us.
         if (intent == null) {
             stopSelf();
             return START_NOT_STICKY;
         }
-        
+
         boolean ring =
         	mPrefs.getBoolean(RetroTimer.PREF_RING_ON_ALARM, true);
-        boolean vibrate = 
+        boolean vibrate =
         	mPrefs.getBoolean(RetroTimer.PREF_VIBRATE_ON_ALARM, true);
-        long timeoutMillis = 
+        long timeoutMillis =
         	mPrefs.getLong(RetroTimer.PREF_ALARM_TIMEOUT_MILLIS, 10*1000);
     	mAlarmTime = intent.getLongExtra(RetroTimer.ALARM_TIME_EXTRA, 0);
 
@@ -186,8 +181,6 @@ public class TimerKlaxon extends Service {
             mMediaPlayer = new MediaPlayer();
             mMediaPlayer.setOnErrorListener(new OnErrorListener() {
             	public boolean onError(MediaPlayer mp, int what, int extra) {
-            		Elog.w(DEBUG_TAG,
-            				"Error occurred while playing alarm sound.");
             		mp.stop();
             		mp.release();
             		mMediaPlayer = null;
@@ -201,7 +194,6 @@ public class TimerKlaxon extends Service {
                  * call. */
                 if (mTelephonyManager.getCallState()
                         != TelephonyManager.CALL_STATE_IDLE) {
-                    Elog.v(DEBUG_TAG, "Using the in-call alarm");
                     mMediaPlayer.setVolume(IN_CALL_VOLUME, IN_CALL_VOLUME);
                     setDataSourceFromResource(getResources(), mMediaPlayer,
                             R.raw.in_call_alarm);
@@ -211,7 +203,8 @@ public class TimerKlaxon extends Service {
                 }
                 startAlarm(mMediaPlayer);
             } catch (Exception ex) {
-                Elog.w(DEBUG_TAG, "Failed to play ringtone: " + ex);
+                // Failed to play ring tone. Not much we can do to save
+                // the situation though...
             }
         }
 
@@ -231,7 +224,7 @@ public class TimerKlaxon extends Service {
                    IllegalStateException {
         final AudioManager audioManager =
         		(AudioManager)getSystemService(Context.AUDIO_SERVICE);
-        /* do not play alarms if stream volume is 0 (typically because 
+        /* do not play alarms if stream volume is 0 (typically because
          * ringer mode is silent). */
         if (audioManager.getStreamVolume(AudioManager.STREAM_ALARM) != 0) {
             player.setAudioStreamType(AudioManager.STREAM_ALARM);

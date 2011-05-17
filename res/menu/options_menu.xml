@@ -2,6 +2,5 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:id="@+id/ring_on_alarm" />
     <item android:id="@+id/vibrate_on_alarm" />
-    <item android:id="@+id/donate"
-    	  android:icon="@drawable/paypal_donate_large" />
+    
 </menu>

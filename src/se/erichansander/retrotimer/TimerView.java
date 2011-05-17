@@ -1,5 +1,5 @@
-/* 
- * Copyright (C) 2010  Eric Hansander
+/*
+ * Copyright (C) 2010-2011  Eric Hansander
  *
  *  This file is part of Retro Timer.
  *
@@ -30,12 +30,10 @@ import android.util.AttributeSet;
 import android.widget.ImageView;
 
 /** Custom view for displaying the timer and drawing the scale on it.
- * 
+ *
  *  For interacting with the timer, see the special classes
  *  TimerSetView and TimerAlertView. */
 public class TimerView extends ImageView {
-
-	private static final String DEBUG_TAG = "TimerView";
 
 	/** The max number of minutes the countdown can be set to */
 	public static final long TIMER_MAX_MINS = 89;
@@ -63,12 +61,12 @@ public class TimerView extends ImageView {
 		mScalePaint.setAntiAlias(true);
 		// set the size in onSizeChanged, when we know how big the view is
 	}
-	
+
 	/** Re-calculate all drawing related variables when view size changes */
 	@Override
 	public void  onSizeChanged  (int intw, int inth, int oldw, int oldh) {
 		mDensityScale = getResources().getDisplayMetrics().density;
-		
+
 		// set the color and font size for the scale
 		mScalePaint.setTextSize(32*mDensityScale);
 
@@ -80,8 +78,8 @@ public class TimerView extends ImageView {
 		// create a curved path for drawing the text scale on
 		mScalePath = new Path();
 
-		float h = (float) inth;
-		float w = (float) intw;
+		float h = inth;
+		float w = intw;
 
 		float middle = h*0.47f;
 		float sidePadding = w*0.02f;
@@ -95,24 +93,13 @@ public class TimerView extends ImageView {
 				150, -120);
 
 		mPathLen = (new PathMeasure(mScalePath, false)).getLength();
-		
-		mLettersInScale = 
-				(int) Math.round(mPathLen / mLetterWidth);
+
+		mLettersInScale =
+				Math.round(mPathLen / mLetterWidth);
 		if (mLettersInScale % 2 == 0) mLettersInScale -= 1;
 		mScaleStartOffset =
 			(mPathLen - mLetterWidth * mLettersInScale) / 2
 			- mLetterWidth / (12*mDensityScale);
-
-		if (RetroTimer.DEBUG) {
-			Elog.d(DEBUG_TAG,
-					"mLettersInScale=" + mLettersInScale +
-					", mScaleStartOffset=" + mScaleStartOffset);
-			Elog.d(DEBUG_TAG, "mDensityScale=" + mDensityScale);
-			Elog.d(DEBUG_TAG, "mLetterWidth=" + mLetterWidth);
-			Elog.d(DEBUG_TAG, 
-					"view h=" + h + ", w=" + w + 
-					", mPathLen=" + mPathLen);
-		}
 	}
 
 	/** Sets the amount of millis left to zero, and redraws the timer */
@@ -126,7 +113,7 @@ public class TimerView extends ImageView {
 	protected void onDraw(Canvas canvas) {
 		super.onDraw(canvas);
 
-		int minute = Math.round((float) mMillisLeft / 60000f);
+		int minute = Math.round(mMillisLeft / 60000f);
 
 		canvas.drawTextOnPath(
 				getScaleString(mLettersInScale, minute),
@@ -134,16 +121,15 @@ public class TimerView extends ImageView {
 	}
 
 	/** Returns a string of given length, centered on given minute
-	 * 
+	 *
 	 * E.g. length = 5 and centerMinute 8 would give:
 	 * ....1
 	 *
-	 * @precond length must be odd 
+	 * @precond length must be odd
 	 */
 	private String getScaleString(int length, int centerMinute) {
-
-		/* The string might become slightly longer then length 
-		 * while we are building it, so add some spare. It will 
+		/* The string might become slightly longer then length
+		 * while we are building it, so add some spare. It will
 		 * be trimmed before we return it. */
 		StringBuilder s = new StringBuilder(length + 3);
 		int bef = 0;
@@ -156,11 +142,6 @@ public class TimerView extends ImageView {
 		} else {
 			s.append(".");
 		}
-		
-//		if (RetroTimer.DEBUG) {
-//			Elog.v(DEBUG_TAG, "bef=" + bef + ",aft=" + aft +
-//			        ", s=" + s);
-//		}
 
 		/* work our way outward, in both the positive and negative
 		 * directions from centerMinute */
@@ -180,7 +161,7 @@ public class TimerView extends ImageView {
 
 			min = centerMinute + i;
 			if (min > TIMER_MAX_MINS) {
-				s.append(" ");				
+				s.append(" ");
 			} else if (min % 5 == 0) {
 				s.append(min);
 				if (min > 5) aft++;
@@ -188,25 +169,9 @@ public class TimerView extends ImageView {
 				s.append(".");
 			}
 			aft++;
-			
-//			if (RetroTimer.DEBUG) {
-//				Elog.v(DEBUG_TAG, "i=" + i +
-//						",bef=" + bef + ",aft=" + aft +
-//						", s=" + s);
-//			}
 		}
-		
-//		if (RetroTimer.DEBUG) {
-//			Elog.v(DEBUG_TAG, "c=" + centerMinute + 
-//					",bef=" + bef + ",aft=" + aft + 
-//					",s.length()=" + s.length() + 
-//					", s=" + s +
-//					", s.substr=" + 
-//					s.substring(bef - length/2, 
-//							bef - length/2 + length));
-//		}
 
-		/* since the two-digit numbers (10, 15...) may have caused 
+		/* since the two-digit numbers (10, 15...) may have caused
 		 * the centerMinute not to be precisely in the middle, we
 		 * need to center it, using substring.
 		 */

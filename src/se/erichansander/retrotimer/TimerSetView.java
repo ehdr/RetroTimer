@@ -1,5 +1,5 @@
-/* 
- * Copyright (C) 2010  Eric Hansander
+/*
+ * Copyright (C) 2010-2011  Eric Hansander
  *
  *  This file is part of Retro Timer.
  *
@@ -28,8 +28,6 @@ import android.view.MotionEvent;
  * events to turn the timer dial. */
 public class TimerSetView extends TimerView {
 
-	private static final String DEBUG_TAG = "TimerSetView";
-
 	private TimerSetListener mListener;
 	private GestureDetector mGestures;
 
@@ -54,17 +52,11 @@ public class TimerSetView extends TimerView {
     }
 
 	private void onTurn(float dx) {
-		final float scale = 
+		final float scale =
 			getContext().getResources().getDisplayMetrics().density;
 
 		float w = this.getWidth()*scale;
 		dx *= scale;
-
-//		if (RetroTimer.DEBUG) {
-//			Elog.v(DEBUG_TAG, 
-//					"onTurn(dx=" + dx + "), mBeingChanged=" + mBeingChanged);
-//			Elog.v(DEBUG_TAG, "getWidth()=" + w);
-//		}
 
 		if (mBeingChanged == false) {
 			mMillisLeftBefore = mMillisLeft;
@@ -75,17 +67,17 @@ public class TimerSetView extends TimerView {
 				Math.round((-dx / w) * 15f * 60000f);
 
 		// Round to the closest full minute
-		mMillisLeft = Math.round((float) mMillisLeft / 60000f)*60000;
+		mMillisLeft = Math.round(mMillisLeft / 60000f)*60000;
 
 		if (mMillisLeft <= 0) {
     		mMillisLeft = 0;
     	} else if (mMillisLeft > TIMER_MAX_MINS*60000) {
     		mMillisLeft = TIMER_MAX_MINS*60000;
     	}
-		
+
 		mListener.onTimerTempValue(mMillisLeft);
 	}
-	
+
 	private void onSet() {
 		mListener.onTimerSetValue(mMillisLeft);
 		mBeingChanged = false;
@@ -95,7 +87,7 @@ public class TimerSetView extends TimerView {
     @Override
     public boolean onTouchEvent(MotionEvent event) {
     	boolean retVal = mGestures.onTouchEvent(event);
-    	
+
     	int action = event.getAction();
         if (action == MotionEvent.ACTION_UP ||
         		action == MotionEvent.ACTION_CANCEL) {
@@ -107,15 +99,15 @@ public class TimerSetView extends TimerView {
         return retVal;
     }
 
-	private class TimerGestureListener 
+	private class TimerGestureListener
 			extends GestureDetector.SimpleOnGestureListener {
 
 		private TimerSetView mView;
-		
+
 		public TimerGestureListener (TimerSetView view) {
 			this.mView = view;
 		}
-		
+
 //		For some reason, this method must return true for onScroll to be called?!
         @Override
         public boolean onDown(MotionEvent e) {
@@ -125,18 +117,12 @@ public class TimerSetView extends TimerView {
 		@Override
 		public boolean onFling(MotionEvent e1, MotionEvent e2,
 				final float velocityX, final float velocityY) {
-//			if (RetroTimer.DEBUG) {
-//				Elog.v(DEBUG_TAG, "onFling");
-//			}
 			return true;
 		}
 
 		@Override
         public boolean onScroll(MotionEvent e1, MotionEvent e2,
                 float distanceX, float distanceY) {
-//			if (RetroTimer.DEBUG) {
-//				Elog.v(DEBUG_TAG, "onScroll");
-//			}
 			mView.onTurn(e2.getX() - e1.getX());
             return true;
 		}

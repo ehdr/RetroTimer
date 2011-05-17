@@ -1,5 +1,5 @@
-/* 
- * Copyright (C) 2010  Eric Hansander
+/*
+ * Copyright (C) 2010-2011  Eric Hansander
  *
  *  This file is part of Retro Timer.
  *
@@ -27,8 +27,6 @@ import android.view.View.OnClickListener;
 /** Special view for displaying the timer, and handling touch events. */
 public class TimerAlertView extends TimerView implements OnClickListener {
 
-	private static final String DEBUG_TAG = "TimerAlertView";
-
 	private TimerAlertListener mListener = null;
 
 	public interface TimerAlertListener {
@@ -44,10 +42,8 @@ public class TimerAlertView extends TimerView implements OnClickListener {
     public void setTimerAlertListener(TimerAlertListener listener) {
         mListener = listener;
     }
-    
+
     public void onClick(View v) {
-//    	Elog.v(DEBUG_TAG, "onClick");
-    	
     	mListener.onAlertDismissed();
     }
 }

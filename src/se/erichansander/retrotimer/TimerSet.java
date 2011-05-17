@@ -1,5 +1,5 @@
-/* 
- * Copyright (C) 2010  Eric Hansander
+/*
+ * Copyright (C) 2010-2011  Eric Hansander
  *
  *  This file is part of Retro Timer.
  *
@@ -26,7 +26,6 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Vibrator;
@@ -39,8 +38,6 @@ import android.widget.Toast;
 
 /** Main activity for setting the timer */
 public class TimerSet extends Activity implements TimerSetListener {
-
-	private static final String DEBUG_TAG = "TimerSet";
 
 	// Identifier for the dialog displaying the license notice
 	private static final int DIALOG_LICENSE_ID = 1;
@@ -72,25 +69,14 @@ public class TimerSet extends Activity implements TimerSetListener {
 	private final Runnable runTimeUpdate = new Runnable() {
 		public void run() {
 			mHandler.postDelayed(this, UPDATE_INTERVAL_MILLIS);
-//	    	if (RetroTimer.DEBUG) {
-//	    		Elog.d(DEBUG_TAG, "runTimeUpdate at " + 
-//	    				DateFormat.format("hh:mm:ss", 
-//	    						System.currentTimeMillis()));
-//	    	}
 			updateTimeLeft();
 		}
 	};
 	private final Runnable delaySetAlarm = new Runnable() {
 		public void run() {
-//	    	if (RetroTimer.DEBUG) {
-//	    		Elog.d(DEBUG_TAG, "delaySetAlarm at " + 
-//	    				DateFormat.format("hh:mm:ss", 
-//	    						System.currentTimeMillis()));
-//	    	}
-
 	    	if (mTimeLeftToBeSet > 0) {
 	    		RetroTimer.setAlarmDelayed(
-	    				TimerSet.this, 
+	    				TimerSet.this,
 	    				mTimeLeftToBeSet);
 	    		startUpdatingTimeLeft();
 	    	} else {
@@ -126,7 +112,7 @@ public class TimerSet extends Activity implements TimerSetListener {
     		updateTimeLeft();
     	}
 	}
-	
+
 	@Override
 	public void onUserInteraction() {
 	    if (!mUserInteracted) {
@@ -144,7 +130,7 @@ public class TimerSet extends Activity implements TimerSetListener {
 	        mUserInteracted = true;
 	    }
 	}
-	
+
 	@Override
 	protected void onResume() {
 		super.onResume();
@@ -161,7 +147,7 @@ public class TimerSet extends Activity implements TimerSetListener {
 			ed.putBoolean(RetroTimer.PREF_HAVE_SHOWN_LICENSE, true);
 			ed.commit();
         }
-        
+
         // Update the time remaining to alarm
         mTimer.invalidate();
 	}
@@ -173,7 +159,7 @@ public class TimerSet extends Activity implements TimerSetListener {
 		// stop updating the display
 		mHandler.removeCallbacks(runTimeUpdate);
 	}
-	
+
 	@Override
 	protected Dialog onCreateDialog(int id) {
 		Dialog dialog;
@@ -194,10 +180,9 @@ public class TimerSet extends Activity implements TimerSetListener {
 			break;
 
 		default:
-			Elog.w(DEBUG_TAG, "Unknown dialog ID in onCreateDialog()");
 			return null;
 		}
-		
+
 		return dialog;
 	}
 
@@ -214,19 +199,19 @@ public class TimerSet extends Activity implements TimerSetListener {
 	@Override
 	public boolean onPrepareOptionsMenu (Menu menu) {
 		MenuItem item;
-		
+
 		item = menu.findItem(R.id.ring_on_alarm);
 		if (mPrefs.getBoolean(RetroTimer.PREF_RING_ON_ALARM, true)) {
 			item.setTitle(R.string.ring_on_alarm_turn_off);
 		} else {
-			item.setTitle(R.string.ring_on_alarm_turn_on);			
+			item.setTitle(R.string.ring_on_alarm_turn_on);
 		}
 
 		item = menu.findItem(R.id.vibrate_on_alarm);
 		if (mPrefs.getBoolean(RetroTimer.PREF_VIBRATE_ON_ALARM, true)) {
 			item.setTitle(R.string.vibrate_on_alarm_turn_off);
 		} else {
-			item.setTitle(R.string.vibrate_on_alarm_turn_on);			
+			item.setTitle(R.string.vibrate_on_alarm_turn_on);
 		}
 
 		return true;
@@ -242,16 +227,8 @@ public class TimerSet extends Activity implements TimerSetListener {
 		  case R.id.vibrate_on_alarm:
 			  toggleVibrateOnAlarm();
 			  return true;
-			  
-		  case R.id.donate:
-			  Intent viewIntent = 
-				  new Intent(Intent.ACTION_VIEW, 
-						  Uri.parse(getString(R.string.donate_url)));
-			  startActivity(viewIntent);  
-			  return true;
 
 		  default:
-			  Elog.w(DEBUG_TAG, "Unknown selection from options menu!");
 			  return super.onOptionsItemSelected(item);
 		}
 	}
@@ -265,14 +242,14 @@ public class TimerSet extends Activity implements TimerSetListener {
 		ed.commit();
 
 		if (mPrefs.getBoolean(RetroTimer.PREF_RING_ON_ALARM, true)) {
-			Toast.makeText(this, 
+			Toast.makeText(this,
 					getResources().getString(
-							R.string.ring_on_alarm_turned_on), 
+							R.string.ring_on_alarm_turned_on),
 							Toast.LENGTH_SHORT).show();
 		} else {
-			Toast.makeText(this, 
+			Toast.makeText(this,
 					getResources().getString(
-							R.string.ring_on_alarm_turned_off), 
+							R.string.ring_on_alarm_turned_off),
 							Toast.LENGTH_SHORT).show();
 		}
 	}
@@ -286,28 +263,23 @@ public class TimerSet extends Activity implements TimerSetListener {
 		ed.commit();
 
 		if (mPrefs.getBoolean(RetroTimer.PREF_VIBRATE_ON_ALARM, true)) {
-			Toast.makeText(this, 
+			Toast.makeText(this,
 					getResources().getString(
-							R.string.vibrate_on_alarm_turned_on), 
+							R.string.vibrate_on_alarm_turned_on),
 							Toast.LENGTH_SHORT).show();
 		} else {
-			Toast.makeText(this, 
+			Toast.makeText(this,
 					getResources().getString(
-							R.string.vibrate_on_alarm_turned_off), 
+							R.string.vibrate_on_alarm_turned_off),
 							Toast.LENGTH_SHORT).show();
 		}
 	}
-	
+
 	private void startUpdatingTimeLeft() {
 		long alarmTime = RetroTimer.getAlarmTime(this);
 		long delay;
 
-//    	if (RetroTimer.DEBUG) {
-//    		Elog.v(DEBUG_TAG, "startUpdatingTimeLeft() at " + 
-//    				DateFormat.format("hh:mm:ss", System.currentTimeMillis()));
-//    	}
-
-		/* calculate how long after a minute tick the alarm will 
+		/* calculate how long after a minute tick the alarm will
 		 * go off */
 		delay = alarmTime % 60000;
 		/* subtract a small amount of time, so the view is updated
@@ -318,15 +290,11 @@ public class TimerSet extends Activity implements TimerSetListener {
 		/* handle the corner case */
 		if (delay < 0) {
 			/* if now is within the first 500 millis of a minute,
-			 * delay will be negative, so we wait a minute before 
-			 * updating */ 
+			 * delay will be negative, so we wait a minute before
+			 * updating */
 			delay += 60000;
 		}
-		
-//    	if (RetroTimer.DEBUG) {
-//    		Elog.v(DEBUG_TAG,
-//    				" posting first runTimeUpdate with delay " + delay);
-//    	}
+
 		mHandler.postDelayed(runTimeUpdate, delay);
 		updateTimeLeft();
 	}
@@ -342,27 +310,25 @@ public class TimerSet extends Activity implements TimerSetListener {
 
 
 	// Callback functions for the TimerSetView class
-	
-	/** Displays the new (temporary) time left and vibrates if the dial is 
+
+	/** Displays the new (temporary) time left and vibrates if the dial is
 	 * turned all the way down to zero.
-	 * 
+	 *
 	 * This method is called when the user is in the process of turning
 	 * the dial, before releasing it (which sets a new alarm).
 	 */
 	public void onTimerTempValue(long millisLeft) {
-//    	Elog.v(DEBUG_TAG, "onTimerTempValue(millisLeft=" + millisLeft + ")");
-
     	if (mPrefs.getBoolean(RetroTimer.PREF_ALARM_SET, true)) {
     		RetroTimer.cancelAlarm(this);
     	}
-    	
+
     	mHandler.removeCallbacks(runTimeUpdate);
     	mHandler.removeCallbacks(delaySetAlarm);
 
     	if (millisLeft <= 0) {
     		millisLeft = 0;
-    		
-    		/* Only vibrate if vibration is turned on, and we are not 
+
+    		/* Only vibrate if vibration is turned on, and we are not
     		 * already at zero */
     		if (mPrefs.getBoolean(RetroTimer.PREF_VIBRATE_ON_ALARM, true) &&
     				!mTempAtZero) {
@@ -377,22 +343,15 @@ public class TimerSet extends Activity implements TimerSetListener {
     }
 
 	/** Actually sets the new timer value
-	 * 
-	 * If at zero, cancels the alarm instead. 
+	 *
+	 * If at zero, cancels the alarm instead.
 	 */
     public void onTimerSetValue (long millisLeft) {
-//    	if (RetroTimer.DEBUG) {
-//    		Elog.d(DEBUG_TAG, "onTimerSetValue(millisLeft=" + millisLeft +
-//    				") at " + 
-//    				DateFormat.format("hh:mm:ss", 
-//    						System.currentTimeMillis()));
-//    	}
-    	
     	if (millisLeft > 0) {
     		mTimeLeftToBeSet = millisLeft;
     		mHandler.removeCallbacks(delaySetAlarm);
     		mHandler.postDelayed(
-    				delaySetAlarm, 
+    				delaySetAlarm,
     				mSetAlarmDelayMillis);
     	}
     }

@@ -1,5 +1,5 @@
-/* 
- * Copyright (C) 2010  Eric Hansander
+/*
+ * Copyright (C) 2010-2011  Eric Hansander
  *
  *  This file is part of Retro Timer.
  *
@@ -16,7 +16,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Retro Timer.  If not, see <http://www.gnu.org/licenses/>.
  *
- * This file incorporates work covered by the following copyright and  
+ * This file incorporates work covered by the following copyright and
  * permission notice:
  *
  *     Copyright (C) 2007 The Android Open Source Project
@@ -36,9 +36,6 @@
 
 package se.erichansander.retrotimer;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -57,12 +54,10 @@ import android.text.format.DateFormat;
  */
 public class AlarmReceiver extends BroadcastReceiver {
 
-	private static final String DEBUG_TAG = "AlarmReceiver";
-
     /** If the alarm is older than STALE_WINDOW seconds, ignore.  It
         is probably the result of a time or timezone change */
     private final static int STALE_WINDOW = 60 * 30;
-    
+
     @Override
     public void onReceive(Context context, Intent intent) {
     	long alarmTime =
@@ -77,8 +72,7 @@ public class AlarmReceiver extends BroadcastReceiver {
     	} else if (RetroTimer.ALARM_DISMISS_ACTION.equals(intent.getAction())) {
             handleAlarmDismiss(context);
         } else {
-        	// Unknown intent! Report an error and bail...
-        	Elog.w(DEBUG_TAG, "Unknown intent received");
+        	// Unknown intent!
         }
     }
 
@@ -87,20 +81,13 @@ public class AlarmReceiver extends BroadcastReceiver {
      * the TimerKlaxon service (which will play alarm and start vibrating)
      * and show a notification that allows dismissing the alarm. Also,
      * show the TimerAlert activity, that also allows dismissing.
-     * 
+     *
      * This is triggered by the AlarmManager.
      */
 	private void handleAlarmTrigger(Context context, long alarmTime) {
-		// Intentionally verbose: always log the alarm time to provide useful
-        // information in bug reports.
         long now = System.currentTimeMillis();
-        SimpleDateFormat format =
-                new SimpleDateFormat("HH:mm:ss.SSS aaa");
-        Elog.v(DEBUG_TAG, ".onReceive() id setFor "
-                + format.format(new Date(alarmTime)));
-
         if (now > alarmTime + STALE_WINDOW * 1000) {
-            Elog.v(DEBUG_TAG, "ignoring stale alarm");
+            // Stale alarm. Just ignore it.
             return;
         }
 
@@ -123,7 +110,7 @@ public class AlarmReceiver extends BroadcastReceiver {
         Intent playAlarm = new Intent(context, TimerKlaxon.class);
         playAlarm.putExtra(RetroTimer.ALARM_TIME_EXTRA, alarmTime);
         context.startService(playAlarm);
-        
+
         // Update the shared state
         RetroTimer.clearAlarm(context);
 
@@ -132,9 +119,9 @@ public class AlarmReceiver extends BroadcastReceiver {
         PendingIntent pendingNotify =
         		PendingIntent.getBroadcast(context, 0, notify, 0);
 
-        String label = 
+        String label =
         		context.getString(R.string.notify_triggered_label);
-        Notification n = 
+        Notification n =
         		new Notification(R.drawable.ic_stat_alarm_triggered,
         				label, 0);
         n.setLatestEventInfo(context, label,
@@ -155,14 +142,12 @@ public class AlarmReceiver extends BroadcastReceiver {
 
 	/**
 	 * Stops the TimerKlaxon service (to stop playing alarm and stop
-	 * vibrating) and displays a notification saying when the alarm 
+	 * vibrating) and displays a notification saying when the alarm
 	 * triggered.
-	 * 
+	 *
 	 * This is normally triggered by the application (not the user).
 	 */
     private void handleAlarmSilence(Context context, long alarmTime) {
-        Elog.v(DEBUG_TAG, "Alarm silenced");
-
         // kill the Klaxon
         context.stopService(new Intent(context, TimerKlaxon.class));
 
@@ -178,7 +163,7 @@ public class AlarmReceiver extends BroadcastReceiver {
 
         // Update the notification to indicate that the alert has been
         // silenced.
-        String label = 
+        String label =
         		context.getString(R.string.notify_silenced_label);
         Notification n =
         		new Notification(R.drawable.ic_stat_alarm_triggered,
@@ -198,12 +183,10 @@ public class AlarmReceiver extends BroadcastReceiver {
 
     /**
      * Stops the TimerKlaxon as above, and also removes any notifications.
-     * 
+     *
      * This is normally triggered by a user action to dismiss the alarm.
      */
     private void handleAlarmDismiss(Context context) {
-        Elog.v(DEBUG_TAG, "Alarm dismissed");
-
         // kill the Klaxon
         context.stopService(new Intent(context, TimerKlaxon.class));
 
