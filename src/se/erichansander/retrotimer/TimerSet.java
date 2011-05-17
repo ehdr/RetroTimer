@@ -59,6 +59,8 @@ public class TimerSet extends Activity implements TimerSetListener {
     private Vibrator mVibrator;
 	private TimerSetView mTimer;
 
+	// True when the user has interacted with the app since the activity was resumed
+	private boolean mUserInteracted = false;
 	// True when timer dial is at zero
 	private boolean mTempAtZero = false;
 	/* Time left (in millis) that the alarm will be set for, when
@@ -126,17 +128,28 @@ public class TimerSet extends Activity implements TimerSetListener {
 	}
 	
 	@Override
+	public void onUserInteraction() {
+	    if (!mUserInteracted) {
+	        /* Make sure to dismiss the alarm, if one should happen to be
+	         * playing. Only on the first user interaction after each resume
+	         * though, that is enough.
+	         *
+	         * The user could have escaped from the TimerAlert activity
+	         * e.g. by pressing Home, which is fine, but chaos will ensue
+	         * if they are allowed to set a new countdown with an alarm
+	         * running!
+	         */
+	        Intent intent = new Intent(RetroTimer.ALARM_DISMISS_ACTION);
+	        sendBroadcast(intent);
+	        mUserInteracted = true;
+	    }
+	}
+	
+	@Override
 	protected void onResume() {
 		super.onResume();
-		/* Make sure to dismiss the alarm, if one should happen to be
-		 * playing.
-		 * 
-		 * The user could have escaped from the TimerAlert activity
-		 * e.g. by pressing Home, which is fine, but chaos will ensue
-		 * if they are allowed to enter TimerSet with an alarm running!
-		 */
-        Intent intent = new Intent(RetroTimer.ALARM_DISMISS_ACTION);
-        sendBroadcast(intent);
+
+		mUserInteracted = false;
 
         /* Only show the license notice if we haven't already */
         if (!mPrefs.getBoolean(RetroTimer.PREF_HAVE_SHOWN_LICENSE,
