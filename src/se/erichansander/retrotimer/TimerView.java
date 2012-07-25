@@ -19,6 +19,9 @@
 
 package se.erichansander.retrotimer;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
@@ -60,7 +63,28 @@ public class TimerView extends ImageView {
 		mScalePaint.setTypeface(Typeface.MONOSPACE);
 		mScalePaint.setAntiAlias(true);
 		// set the size in onSizeChanged, when we know how big the view is
-	}
+
+        /*
+         * The drawTextOnPath() operation (used below) is not supported with HW
+         * acceleration, so we need to disable it with setLayerType(). However,
+         * that method only exists in API rev 11 and up, so we must be careful.
+         */
+        try {
+            Method method = this.getClass().getMethod("setLayerType",
+                    new Class[] { int.class, Paint.class });
+            method.invoke(this, new Object[] { LAYER_TYPE_SOFTWARE, null });
+        } catch (NoSuchMethodException e) {
+             // setLayerType() does not exist, which should mean that API rev is
+             // less than 11 and we won't have problems with HW acceleration
+             // anyway
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        }
+    }
 
 	/** Re-calculate all drawing related variables when view size changes */
 	@Override
