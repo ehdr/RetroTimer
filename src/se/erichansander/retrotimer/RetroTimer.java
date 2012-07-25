@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010-2011  Eric Hansander
+ * Copyright (C) 2010-2012  Eric Hansander
  *
  *  This file is part of Retro Timer.
  *
@@ -18,12 +18,6 @@
  */
 
 package se.erichansander.retrotimer;
-
-//TODO: add instrumentation
-//TODO: add test
-//TODO: optimize string creation?
-//TODO: animate TimerAlert?
-
 
 import android.app.AlarmManager;
 import android.app.Application;
