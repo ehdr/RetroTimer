@@ -8,11 +8,11 @@
 
     <!-- Notification texts -->
     <string name="notify_set_label">Retro Timer is set</string>
-    <string name="notify_set_text">Alarm set to trigger at %s (approximately)</string>
+    <string name="notify_set_text">Alarm set to trigger at %1$s (approximately)</string>
     <string name="notify_triggered_label">Retro Timer alert</string>
     <string name="notify_triggered_text">Select to dismiss the alarm</string>
     <string name="notify_silenced_label">Retro Timer silenced</string>
-    <string name="notify_silenced_text">Alarm triggered at %s</string>
+    <string name="notify_silenced_text">Alarm triggered at %1$s</string>
 
     <!-- Labels -->
     <string name="touch_to_dismiss">Touch to dismiss</string>
@@ -31,7 +31,7 @@
 
     <!-- License notice -->
     <string name="license_notice_title">License notice</string>
-    <string name="license_notice_text">Copyright (C) 2010-2012  Eric Hansander\n
+    <string name="license_notice_text">Copyright © 2010-2012  Eric Hansander\n
 \n
   Retro Timer is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
