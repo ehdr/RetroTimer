@@ -32,37 +32,38 @@ import android.graphics.Typeface;
 import android.util.AttributeSet;
 import android.widget.ImageView;
 
-/** Custom view for displaying the timer and drawing the scale on it.
- *
- *  For interacting with the timer, see the special classes
- *  TimerSetView and TimerAlertView. */
+/**
+ * Custom view for displaying the timer and drawing the scale on it.
+ * 
+ * For interacting with the timer, see the special classes TimerSetView and
+ * TimerAlertView.
+ */
 public class TimerView extends ImageView {
 
-	/** The max number of minutes the countdown can be set to */
-	public static final long TIMER_MAX_MINS = 89;
+    /** The max number of minutes the countdown can be set to */
+    public static final long TIMER_MAX_MINS = 89;
 
-	private Paint mScalePaint;
-	private Path mScalePath;
+    private Paint mScalePaint;
+    private Path mScalePath;
 
-	// variables used for drawing the scale, with correct length
-	// and position, etc
-	private float mDensityScale;
-	private float mLetterWidth;
-	private float mPathLen;
-	private int mLettersInScale;
-	private float mScaleStartOffset;
+    // variables used for drawing the scale, with correct length
+    // and position, etc
+    private float mDensityScale;
+    private float mLetterWidth;
+    private float mPathLen;
+    private int mLettersInScale;
+    private float mScaleStartOffset;
 
-	protected long mMillisLeft = 0;
+    protected long mMillisLeft = 0;
 
-	public TimerView (Context context, AttributeSet attrs) {
-		super(context, attrs);
+    public TimerView(Context context, AttributeSet attrs) {
+        super(context, attrs);
 
-		mScalePaint = new Paint();
-		mScalePaint.setColor(
-				getResources().getColor(R.color.timer_scale));
-		mScalePaint.setTypeface(Typeface.MONOSPACE);
-		mScalePaint.setAntiAlias(true);
-		// set the size in onSizeChanged, when we know how big the view is
+        mScalePaint = new Paint();
+        mScalePaint.setColor(getResources().getColor(R.color.timer_scale));
+        mScalePaint.setTypeface(Typeface.MONOSPACE);
+        mScalePaint.setAntiAlias(true);
+        // set the size in onSizeChanged, when we know how big the view is
 
         /*
          * The drawTextOnPath() operation (used below) is not supported with HW
@@ -74,9 +75,9 @@ public class TimerView extends ImageView {
                     new Class[] { int.class, Paint.class });
             method.invoke(this, new Object[] { LAYER_TYPE_SOFTWARE, null });
         } catch (NoSuchMethodException e) {
-             // setLayerType() does not exist, which should mean that API rev is
-             // less than 11 and we won't have problems with HW acceleration
-             // anyway
+            // setLayerType() does not exist, which should mean that API rev is
+            // less than 11 and we won't have problems with HW acceleration
+            // anyway
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
         } catch (IllegalAccessException e) {
@@ -86,120 +87,122 @@ public class TimerView extends ImageView {
         }
     }
 
-	/** Re-calculate all drawing related variables when view size changes */
-	@Override
-	public void  onSizeChanged  (int intw, int inth, int oldw, int oldh) {
-		mDensityScale = getResources().getDisplayMetrics().density;
+    /** Re-calculate all drawing related variables when view size changes */
+    @Override
+    public void onSizeChanged(int intw, int inth, int oldw, int oldh) {
+        mDensityScale = getResources().getDisplayMetrics().density;
 
-		// set the color and font size for the scale
-		mScalePaint.setTextSize(32*mDensityScale);
+        // set the color and font size for the scale
+        mScalePaint.setTextSize(32 * mDensityScale);
 
-		// measure the width of one letter (same for all since MONOSPACE)
-		float widths[] = new float[1];
-		mScalePaint.getTextWidths("...", 0, 1, widths);
-		mLetterWidth = widths[0];
+        // measure the width of one letter (same for all since MONOSPACE)
+        float widths[] = new float[1];
+        mScalePaint.getTextWidths("...", 0, 1, widths);
+        mLetterWidth = widths[0];
 
-		// create a curved path for drawing the text scale on
-		mScalePath = new Path();
+        // create a curved path for drawing the text scale on
+        mScalePath = new Path();
 
-		float h = inth;
-		float w = intw;
+        float h = inth;
+        float w = intw;
 
-		float middle = h*0.47f;
-		float sidePadding = w*0.02f;
-		float ovalHeight = h*0.14f;
+        float middle = h * 0.47f;
+        float sidePadding = w * 0.02f;
+        float ovalHeight = h * 0.14f;
 
-		mScalePath.moveTo(sidePadding, middle);
-		mScalePath.addArc(new RectF(sidePadding,
-				middle-ovalHeight,
-				w-sidePadding,
-				middle+ovalHeight),
-				150, -120);
+        mScalePath.moveTo(sidePadding, middle);
+        mScalePath.addArc(new RectF(sidePadding, middle - ovalHeight, w
+                - sidePadding, middle + ovalHeight), 150, -120);
 
-		mPathLen = (new PathMeasure(mScalePath, false)).getLength();
+        mPathLen = (new PathMeasure(mScalePath, false)).getLength();
 
-		mLettersInScale =
-				Math.round(mPathLen / mLetterWidth);
-		if (mLettersInScale % 2 == 0) mLettersInScale -= 1;
-		mScaleStartOffset =
-			(mPathLen - mLetterWidth * mLettersInScale) / 2
-			- mLetterWidth / (12*mDensityScale);
-	}
-
-	/** Sets the amount of millis left to zero, and redraws the timer */
-    public void setMillisLeft(long millis) {
-    	mMillisLeft = millis;
-
-		invalidate(); // redraw the egg
+        mLettersInScale = Math.round(mPathLen / mLetterWidth);
+        if (mLettersInScale % 2 == 0)
+            mLettersInScale -= 1;
+        mScaleStartOffset = (mPathLen - mLetterWidth * mLettersInScale) / 2
+                - mLetterWidth / (12 * mDensityScale);
     }
 
-	@Override
-	protected void onDraw(Canvas canvas) {
-		super.onDraw(canvas);
+    /** Sets the amount of millis left to zero, and redraws the timer */
+    public void setMillisLeft(long millis) {
+        mMillisLeft = millis;
 
-		int minute = Math.round(mMillisLeft / 60000f);
+        invalidate(); // redraw the egg
+    }
 
-		canvas.drawTextOnPath(
-				getScaleString(mLettersInScale, minute),
-				mScalePath, mScaleStartOffset, 0, mScalePaint);
-	}
+    @Override
+    protected void onDraw(Canvas canvas) {
+        super.onDraw(canvas);
 
-	/** Returns a string of given length, centered on given minute
-	 *
-	 * E.g. length = 5 and centerMinute 8 would give:
-	 * ....1
-	 *
-	 * @precond length must be odd
-	 */
-	private String getScaleString(int length, int centerMinute) {
-		/* The string might become slightly longer then length
-		 * while we are building it, so add some spare. It will
-		 * be trimmed before we return it. */
-		StringBuilder s = new StringBuilder(length + 3);
-		int bef = 0;
-		int aft = 0;
+        int minute = Math.round(mMillisLeft / 60000f);
 
-		// Start with the center minute number
-		if (centerMinute % 5 == 0) {
-			s.append(centerMinute);
-			if (centerMinute > 5) bef++;
-		} else {
-			s.append(".");
-		}
+        canvas.drawTextOnPath(getScaleString(mLettersInScale, minute),
+                mScalePath, mScaleStartOffset, 0, mScalePaint);
+    }
 
-		/* work our way outward, in both the positive and negative
-		 * directions from centerMinute */
-		for (int i = 1; i <= length / 2; i++) {
-			int min;
+    /**
+     * Returns a string of given length, centered on given minute
+     * 
+     * E.g. length = 5 and centerMinute 8 would give: ....1
+     * 
+     * @precond length must be odd
+     */
+    private String getScaleString(int length, int centerMinute) {
+        /*
+         * The string might become slightly longer then length while we are
+         * building it, so add some spare. It will be trimmed before we return
+         * it.
+         */
+        StringBuilder s = new StringBuilder(length + 3);
+        int bef = 0;
+        int aft = 0;
 
-			min = centerMinute - i;
-			if (min < 0) {
-				s.insert(0, " ");
-			} else if (min % 5 == 0) {
-				s.insert(0, min);
-				if (min > 5) bef++;
-			} else {
-				s.insert(0, ".");
-			}
-			bef++;
+        // Start with the center minute number
+        if (centerMinute % 5 == 0) {
+            s.append(centerMinute);
+            if (centerMinute > 5)
+                bef++;
+        } else {
+            s.append(".");
+        }
 
-			min = centerMinute + i;
-			if (min > TIMER_MAX_MINS) {
-				s.append(" ");
-			} else if (min % 5 == 0) {
-				s.append(min);
-				if (min > 5) aft++;
-			} else {
-				s.append(".");
-			}
-			aft++;
-		}
+        /*
+         * work our way outward, in both the positive and negative directions
+         * from centerMinute
+         */
+        for (int i = 1; i <= length / 2; i++) {
+            int min;
 
-		/* since the two-digit numbers (10, 15...) may have caused
-		 * the centerMinute not to be precisely in the middle, we
-		 * need to center it, using substring.
-		 */
-		return s.substring(bef - length/2,
-				bef - length/2 + length);
-	}
+            min = centerMinute - i;
+            if (min < 0) {
+                s.insert(0, " ");
+            } else if (min % 5 == 0) {
+                s.insert(0, min);
+                if (min > 5)
+                    bef++;
+            } else {
+                s.insert(0, ".");
+            }
+            bef++;
+
+            min = centerMinute + i;
+            if (min > TIMER_MAX_MINS) {
+                s.append(" ");
+            } else if (min % 5 == 0) {
+                s.append(min);
+                if (min > 5)
+                    aft++;
+            } else {
+                s.append(".");
+            }
+            aft++;
+        }
+
+        /*
+         * since the two-digit numbers (10, 15...) may have caused the
+         * centerMinute not to be precisely in the middle, we need to center it,
+         * using substring.
+         */
+        return s.substring(bef - length / 2, bef - length / 2 + length);
+    }
 }

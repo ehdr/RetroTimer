@@ -40,15 +40,15 @@ import android.content.Context;
 import android.os.PowerManager;
 
 /**
- * Hold a wakelock that can be acquired in the AlarmReceiver and
- * released in the TimerAlert activity.
- *
- * This file is borrowed almost without modification from the
- * DeskClock app included with Android.
+ * Hold a wakelock that can be acquired in the AlarmReceiver and released in the
+ * TimerAlert activity.
+ * 
+ * This file is borrowed almost without modification from the DeskClock app
+ * included with Android.
  */
 class WakeLockHolder {
 
-	private static final String TAG = "WakeLockHolder";
+    private static final String TAG = "WakeLockHolder";
 
     private static PowerManager.WakeLock sCpuWakeLock;
 
@@ -57,14 +57,12 @@ class WakeLockHolder {
             return;
         }
 
-        PowerManager pm =
-                (PowerManager) context.getSystemService(Context.POWER_SERVICE);
+        PowerManager pm = (PowerManager) context
+                .getSystemService(Context.POWER_SERVICE);
 
-        sCpuWakeLock = pm.newWakeLock(
-        		PowerManager.SCREEN_DIM_WAKE_LOCK |
-                PowerManager.ACQUIRE_CAUSES_WAKEUP |
-                PowerManager.ON_AFTER_RELEASE,
-                TAG);
+        sCpuWakeLock = pm.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK
+                | PowerManager.ACQUIRE_CAUSES_WAKEUP
+                | PowerManager.ON_AFTER_RELEASE, TAG);
         sCpuWakeLock.acquire();
     }
 

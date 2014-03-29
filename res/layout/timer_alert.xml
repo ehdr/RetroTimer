@@ -1,30 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-		xmlns:android="http://schemas.android.com/apk/res/android"
-    	android:orientation="vertical"
-    	android:background="@color/background"
-		android:layout_height="fill_parent"
-		android:layout_width="fill_parent">
-	
-	<se.erichansander.retrotimer.TimerAlertView
-		android:id="@+id/timer_alert_view"
-		android:src="@drawable/timer"
-		android:layout_centerVertical="true"
-		android:layout_centerHorizontal="true"
-		android:layout_height="420dp"
-		android:layout_width="360dp">
-	</se.erichansander.retrotimer.TimerAlertView>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@color/background"
+    android:orientation="vertical" >
 
-	<TextView
+    <se.erichansander.retrotimer.TimerAlertView
+        android:id="@+id/timer_alert_view"
+        android:layout_width="360dp"
+        android:layout_height="420dp"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:src="@drawable/timer" >
+    </se.erichansander.retrotimer.TimerAlertView>
+
+    <TextView
+        android:id="@+id/dismiss_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/timer_alert_view"
         android:layout_centerHorizontal="true"
+        android:layout_marginBottom="60dp"
+        android:background="@android:color/transparent"
         android:text="@string/touch_to_dismiss"
         android:textColor="@color/timer_scale"
-        android:background="@android:color/transparent"
-        android:textSize="20dp"
-        android:id="@+id/dismiss_text"
-        android:layout_alignBottom="@+id/timer_alert_view"
-        android:layout_marginBottom="60dp">
-	</TextView>
+        android:textSize="20dp" >
+    </TextView>
+
 </RelativeLayout>

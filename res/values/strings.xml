@@ -1,37 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
     <string name="app_label">Retro Timer</string>
 
-	<!-- Activity labels -->
-	<string name="timer_alert_label">Retro Timer alert</string>
+    <!-- Activity labels -->
+    <string name="timer_alert_label">Retro Timer alert</string>
 
-	<!-- Notification texts -->
-	<string name="notify_set_label">Retro Timer is set</string>
-	<string name="notify_set_text">Alarm set to trigger at %s (approximately)</string>
-	<string name="notify_triggered_label">Retro Timer alert</string>
-	<string name="notify_triggered_text">Select to dismiss the alarm</string>
-	<string name="notify_silenced_label">Retro Timer silenced</string>
-	<string name="notify_silenced_text">Alarm triggered at %s</string>
+    <!-- Notification texts -->
+    <string name="notify_set_label">Retro Timer is set</string>
+    <string name="notify_set_text">Alarm set to trigger at %s (approximately)</string>
+    <string name="notify_triggered_label">Retro Timer alert</string>
+    <string name="notify_triggered_text">Select to dismiss the alarm</string>
+    <string name="notify_silenced_label">Retro Timer silenced</string>
+    <string name="notify_silenced_text">Alarm triggered at %s</string>
 
-	<!-- Labels -->
-	<string name="touch_to_dismiss">Touch to dismiss</string>
+    <!-- Labels -->
+    <string name="touch_to_dismiss">Touch to dismiss</string>
 
-	<!-- Menu labels -->
-	<string name="ring_on_alarm_turn_on">Ring!</string>
-	<string name="ring_on_alarm_turn_off">Don\'t ring</string>
-	<string name="vibrate_on_alarm_turn_on">Vibrate!</string>
-	<string name="vibrate_on_alarm_turn_off">Don\'t vibrate</string>
+    <!-- Menu labels -->
+    <string name="ring_on_alarm_turn_on">Ring!</string>
+    <string name="ring_on_alarm_turn_off">Don\'t ring</string>
+    <string name="vibrate_on_alarm_turn_on">Vibrate!</string>
+    <string name="vibrate_on_alarm_turn_off">Don\'t vibrate</string>
 
-	<!-- Toast texts -->
-	<string name="ring_on_alarm_turned_on">Will now ring on alarm</string>
-	<string name="ring_on_alarm_turned_off">Will now not ring on alarm</string>
-	<string name="vibrate_on_alarm_turned_on">Will now vibrate on alarm</string>
-	<string name="vibrate_on_alarm_turned_off">Will now not vibrate on alarm</string>
+    <!-- Toast texts -->
+    <string name="ring_on_alarm_turned_on">Will now ring on alarm</string>
+    <string name="ring_on_alarm_turned_off">Will now not ring on alarm</string>
+    <string name="vibrate_on_alarm_turned_on">Will now vibrate on alarm</string>
+    <string name="vibrate_on_alarm_turned_off">Will now not vibrate on alarm</string>
 
-	<!-- License notice -->
-	<string name="license_notice_title">License notice</string>
-	<string name="license_notice_text">
-Copyright (C) 2010-2012  Eric Hansander\n
+    <!-- License notice -->
+    <string name="license_notice_title">License notice</string>
+    <string name="license_notice_text">Copyright (C) 2010-2012  Eric Hansander\n
 \n
   Retro Timer is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -44,7 +44,7 @@ Copyright (C) 2010-2012  Eric Hansander\n
   GNU General Public License for more details.\n
 \n
   You should have received a copy of the GNU General Public License
-  along with Retro Timer.  If not, see http://www.gnu.org/licenses/.
-</string>
-	<string name="license_notice_button">OK</string>
+  along with Retro Timer.  If not, see http://www.gnu.org/licenses/.</string>
+    <string name="license_notice_button">OK</string>
+
 </resources>

@@ -1,59 +1,63 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-      package="se.erichansander.retrotimer"
-      android:versionCode="6"
-      android:versionName="1.3">
+    package="se.erichansander.retrotimer"
+    android:versionCode="6"
+    android:versionName="1.3" >
 
-	<uses-sdk
-	    android:minSdkVersion="4"
-	    android:targetSdkVersion="15" />
+    <uses-sdk
+        android:minSdkVersion="4"
+        android:targetSdkVersion="15" />
 
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
-    <uses-permission android:name="android.permission.WAKE_LOCK"/>
-    <uses-permission android:name="android.permission.VIBRATE"/>
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
 
-    <application android:label="@string/app_label"
-				 android:icon="@drawable/ic_launcher"
-				 android:name=".RetroTimer"> 
-
-        <activity android:name=".TimerSet"
-                  android:label="@string/app_label"
-                  android:launchMode="singleInstance"
-                  android:screenOrientation="portrait">
+    <application
+        android:name=".RetroTimer"
+        android:icon="@drawable/ic_launcher"
+        android:label="@string/app_label" >
+        <activity
+            android:name=".TimerSet"
+            android:label="@string/app_label"
+            android:launchMode="singleInstance"
+            android:screenOrientation="portrait" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <activity android:name=".TimerAlert"
-                  android:label="@string/timer_alert_label"
-                  android:launchMode="singleInstance"
-                  android:screenOrientation="portrait">
+        <activity
+            android:name=".TimerAlert"
+            android:label="@string/timer_alert_label"
+            android:launchMode="singleInstance"
+            android:screenOrientation="portrait" >
         </activity>
 
-        <receiver android:name=".AlarmReceiver">
-        	<!-- RetroTimer specific intents -->
+        <receiver android:name=".AlarmReceiver" >
+
+            <!-- RetroTimer specific intents -->
             <intent-filter>
-               <action android:name="se.erichansander.retrotimer.ALARM_TRIGGER" />
-               <action android:name="se.erichansander.retrotimer.ALARM_SILENCE" />
-               <action android:name="se.erichansander.retrotimer.ALARM_DISMISS" />
+                <action android:name="se.erichansander.retrotimer.ALARM_TRIGGER" />
+                <action android:name="se.erichansander.retrotimer.ALARM_SILENCE" />
+                <action android:name="se.erichansander.retrotimer.ALARM_DISMISS" />
             </intent-filter>
 
             <!-- Android system intents -->
             <intent-filter>
-               <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
 
-        <!-- This service plays the alarm alert and vibrates the device.
+        <!--
+             This service plays the alarm alert and vibrates the device.
              This allows the alert to continue playing even if another activity
-             causes the AlarmAlert activity to pause. -->
-        <service android:name=".TimerKlaxon">
+             causes the AlarmAlert activity to pause.
+        -->
+        <service android:name=".TimerKlaxon" >
         </service>
-
     </application>
 
-</manifest> 
+</manifest>

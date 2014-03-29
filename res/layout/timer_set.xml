@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-		xmlns:android="http://schemas.android.com/apk/res/android"
-    	android:orientation="vertical"
-    	android:background="@color/background"
-		android:layout_height="fill_parent"
-		android:layout_width="fill_parent">
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@color/background"
+    android:orientation="vertical" >
 
-	<se.erichansander.retrotimer.TimerSetView
-		android:id="@+id/timer_set_view"
-		android:src="@drawable/timer"
-		android:layout_centerVertical="true"
-		android:layout_centerHorizontal="true"
-		android:layout_height="420dp"
-		android:layout_width="360dp">
-	</se.erichansander.retrotimer.TimerSetView>
+    <se.erichansander.retrotimer.TimerSetView
+        android:id="@+id/timer_set_view"
+        android:layout_width="360dp"
+        android:layout_height="420dp"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:src="@drawable/timer" >
+    </se.erichansander.retrotimer.TimerSetView>
+
 </RelativeLayout>

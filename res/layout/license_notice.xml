@@ -3,17 +3,18 @@
     android:id="@+id/license_notice_scroller"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    android:paddingTop="2dip"
-    android:paddingBottom="12dip" 
+    android:paddingBottom="12dip"
     android:paddingLeft="14dip"
-    android:paddingRight="10dip">
+    android:paddingRight="10dip"
+    android:paddingTop="2dip" >
 
-    <TextView android:id="@+id/license_notice_text"
-    	style="?android:attr/textAppearanceSmall"
-    	android:text="@string/license_notice_text"
-        android:layout_width="fill_parent" 
+    <TextView
+        android:id="@+id/license_notice_text"
+        style="?android:attr/textAppearanceSmall"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:autoLink="web"
-        android:padding="5dip" />
+        android:padding="5dip"
+        android:text="@string/license_notice_text" />
 
 </ScrollView>

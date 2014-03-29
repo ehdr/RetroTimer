@@ -56,13 +56,16 @@ import android.telephony.TelephonyManager;
 /**
  * Plays alarm and vibrates. Runs as a service so that it can continue to play
  * if another activity overrides the TimerAlert view.
- *
+ * 
  * Receives the ALARM_PLAY_ACTION intent when started.
  */
 public class TimerKlaxon extends Service {
 
-    /* Comment from the DeskClock app:
-	 * Volume suggested by media team for in-call alarms. */
+    /*
+     * Comment from the DeskClock app:
+     * 
+     * Volume suggested by media team for in-call alarms.
+     */
     private static final float IN_CALL_VOLUME = 0.125f;
 
     private static final long[] sVibratePattern = new long[] { 500, 500 };
@@ -83,23 +86,23 @@ public class TimerKlaxon extends Service {
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what) {
-                case TIMEOUT_ID:
-                    broadcastSilenceAlarmIntent(mAlarmTime);
-                    stopSelf();
-                    break;
+            case TIMEOUT_ID:
+                broadcastSilenceAlarmIntent(mAlarmTime);
+                stopSelf();
+                break;
             }
         }
     };
 
-    private PhoneStateListener mPhoneStateListener =
-    		new PhoneStateListener() {
+    private PhoneStateListener mPhoneStateListener = new PhoneStateListener() {
         @Override
         public void onCallStateChanged(int state, String ignored) {
-            /* The user might already be in a call when the alarm fires.
-             * When we register onCallStateChanged, we get the initial
-             * in-call state which kills the alarm. Check against the
-             * initial call state so we don't kill the alarm during a
-             * call. */
+            /*
+             * The user might already be in a call when the alarm fires. When we
+             * register onCallStateChanged, we get the initial in-call state
+             * which kills the alarm. Check against the initial call state so we
+             * don't kill the alarm during a call.
+             */
             if (state != TelephonyManager.CALL_STATE_IDLE
                     && state != mInitialCallState) {
                 broadcastSilenceAlarmIntent(mAlarmTime);
@@ -114,10 +117,9 @@ public class TimerKlaxon extends Service {
         mVibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
 
         // Listen for incoming calls to kill the alarm.
-        mTelephonyManager =
-                (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
-        mTelephonyManager.listen(
-                mPhoneStateListener, PhoneStateListener.LISTEN_CALL_STATE);
+        mTelephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+        mTelephonyManager.listen(mPhoneStateListener,
+                PhoneStateListener.LISTEN_CALL_STATE);
 
         WakeLockHolder.acquireCpuWakeLock(this);
     }
@@ -137,8 +139,8 @@ public class TimerKlaxon extends Service {
 
     @Override
     public void onStart(Intent intent, int startId) {
-    	// For backwards compatibility with pre-API 8 systems
-    	onStartCommand(intent, 0, startId);
+        // For backwards compatibility with pre-API 8 systems
+        onStartCommand(intent, 0, startId);
     }
 
     @Override
@@ -149,13 +151,12 @@ public class TimerKlaxon extends Service {
             return START_NOT_STICKY;
         }
 
-        boolean ring =
-        	mPrefs.getBoolean(RetroTimer.PREF_RING_ON_ALARM, true);
-        boolean vibrate =
-        	mPrefs.getBoolean(RetroTimer.PREF_VIBRATE_ON_ALARM, true);
-        long timeoutMillis =
-        	mPrefs.getLong(RetroTimer.PREF_ALARM_TIMEOUT_MILLIS, 10*1000);
-    	mAlarmTime = intent.getLongExtra(RetroTimer.ALARM_TIME_EXTRA, 0);
+        boolean ring = mPrefs.getBoolean(RetroTimer.PREF_RING_ON_ALARM, true);
+        boolean vibrate = mPrefs.getBoolean(RetroTimer.PREF_VIBRATE_ON_ALARM,
+                true);
+        long timeoutMillis = mPrefs.getLong(
+                RetroTimer.PREF_ALARM_TIMEOUT_MILLIS, 10 * 1000);
+        mAlarmTime = intent.getLongExtra(RetroTimer.ALARM_TIME_EXTRA, 0);
 
         play(ring, vibrate);
         startTimeoutCountdown(timeoutMillis);
@@ -180,20 +181,20 @@ public class TimerKlaxon extends Service {
         if (ring) {
             mMediaPlayer = new MediaPlayer();
             mMediaPlayer.setOnErrorListener(new OnErrorListener() {
-            	public boolean onError(MediaPlayer mp, int what, int extra) {
-            		mp.stop();
-            		mp.release();
-            		mMediaPlayer = null;
-            		return true;
-            	}
+                public boolean onError(MediaPlayer mp, int what, int extra) {
+                    mp.stop();
+                    mp.release();
+                    mMediaPlayer = null;
+                    return true;
+                }
             });
 
             try {
-                /* Check if we are in a call. If we are, use the in-call
-                 * alarm resource at a low volume to not disrupt the
-                 * call. */
-                if (mTelephonyManager.getCallState()
-                        != TelephonyManager.CALL_STATE_IDLE) {
+                /*
+                 * Check if we are in a call. If we are, use the in-call alarm
+                 * resource at a low volume to not disrupt the call.
+                 */
+                if (mTelephonyManager.getCallState() != TelephonyManager.CALL_STATE_IDLE) {
                     mMediaPlayer.setVolume(IN_CALL_VOLUME, IN_CALL_VOLUME);
                     setDataSourceFromResource(getResources(), mMediaPlayer,
                             R.raw.in_call_alarm);
@@ -219,13 +220,13 @@ public class TimerKlaxon extends Service {
     }
 
     // Do the common stuff when starting the alarm.
-    private void startAlarm(MediaPlayer player)
-            throws java.io.IOException, IllegalArgumentException,
-                   IllegalStateException {
-        final AudioManager audioManager =
-        		(AudioManager)getSystemService(Context.AUDIO_SERVICE);
-        /* do not play alarms if stream volume is 0 (typically because
-         * ringer mode is silent). */
+    private void startAlarm(MediaPlayer player) throws java.io.IOException,
+            IllegalArgumentException, IllegalStateException {
+        final AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+        /*
+         * do not play alarms if stream volume is 0 (typically because ringer
+         * mode is silent).
+         */
         if (audioManager.getStreamVolume(AudioManager.STREAM_ALARM) != 0) {
             player.setAudioStreamType(AudioManager.STREAM_ALARM);
             player.setLooping(true);
@@ -265,8 +266,8 @@ public class TimerKlaxon extends Service {
     }
 
     /**
-     * Kills alarm audio after timeoutMillis millis, so the alarm
-     * won't run all day.
+     * Kills alarm audio after timeoutMillis millis, so the alarm won't run all
+     * day.
      */
     private void startTimeoutCountdown(long timeoutMillis) {
         mHandler.sendMessageDelayed(mHandler.obtainMessage(TIMEOUT_ID),

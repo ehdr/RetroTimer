@@ -27,23 +27,23 @@ import android.view.View.OnClickListener;
 /** Special view for displaying the timer, and handling touch events. */
 public class TimerAlertView extends TimerView implements OnClickListener {
 
-	private TimerAlertListener mListener = null;
+    private TimerAlertListener mListener = null;
 
-	public interface TimerAlertListener {
-		abstract void onAlertDismissed();
-	}
+    public interface TimerAlertListener {
+        abstract void onAlertDismissed();
+    }
 
-	public TimerAlertView (Context context, AttributeSet attrs) {
-		super(context, attrs);
+    public TimerAlertView(Context context, AttributeSet attrs) {
+        super(context, attrs);
 
-		this.setOnClickListener(this);
-	}
+        this.setOnClickListener(this);
+    }
 
     public void setTimerAlertListener(TimerAlertListener listener) {
         mListener = listener;
     }
 
     public void onClick(View v) {
-    	mListener.onAlertDismissed();
+        mListener.onAlertDismissed();
     }
 }
