@@ -42,6 +42,7 @@ import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.support.v4.app.NotificationCompat;
 import android.text.format.DateFormat;
 
 /**
@@ -125,15 +126,16 @@ public class AlarmReceiver extends BroadcastReceiver {
         PendingIntent pendingNotify = PendingIntent.getBroadcast(context, 0,
                 notify, 0);
 
-        String label = context.getString(R.string.notify_triggered_label);
-        Notification n = new Notification(R.drawable.ic_stat_alarm_triggered,
-                label, 0);
-        n.setLatestEventInfo(context, label,
-                context.getString(R.string.notify_triggered_text),
-                pendingNotify);
-        n.flags |= Notification.FLAG_SHOW_LIGHTS
-                | Notification.FLAG_ONGOING_EVENT | Notification.FLAG_NO_CLEAR;
-        n.defaults |= Notification.DEFAULT_LIGHTS;
+        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(
+                context)
+                .setContentIntent(pendingNotify)
+                .setDefaults(Notification.DEFAULT_LIGHTS)
+                .setOngoing(true)
+                .setSmallIcon(R.drawable.ic_stat_alarm_triggered)
+                .setContentTitle(
+                        context.getString(R.string.notify_triggered_label))
+                .setContentText(
+                        context.getString(R.string.notify_triggered_text));
 
         /*
          * Send the notification using the alarm id to easily identify the
@@ -142,7 +144,7 @@ public class AlarmReceiver extends BroadcastReceiver {
         NotificationManager nm = (NotificationManager) context
                 .getSystemService(Context.NOTIFICATION_SERVICE);
         nm.cancel(RetroTimer.NOTIF_SET_ID);
-        nm.notify(RetroTimer.NOTIF_TRIGGERED_ID, n);
+        nm.notify(RetroTimer.NOTIF_TRIGGERED_ID, mBuilder.build());
     }
 
     /**
@@ -167,18 +169,23 @@ public class AlarmReceiver extends BroadcastReceiver {
 
         // Update the notification to indicate that the alert has been
         // silenced.
-        String label = context.getString(R.string.notify_silenced_label);
-        Notification n = new Notification(R.drawable.ic_stat_alarm_triggered,
-                label, 0);
-        n.setLatestEventInfo(context, label, context.getString(
-                R.string.notify_silenced_text, DateFormat
-                        .getTimeFormat(context).format(alarmTime)), intent);
-        n.flags |= Notification.FLAG_AUTO_CANCEL;
+        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(
+                context)
+                .setContentIntent(intent)
+                .setAutoCancel(true)
+                .setSmallIcon(R.drawable.ic_stat_alarm_triggered)
+                .setContentTitle(
+                        context.getString(R.string.notify_silenced_label))
+                .setContentText(
+                        context.getString(
+                                R.string.notify_silenced_text,
+                                DateFormat.getTimeFormat(context).format(
+                                        alarmTime)));
         // We have to cancel the original notification since it is in the
         // ongoing section and we want the "killed" notification to be a plain
         // notification.
         nm.cancel(RetroTimer.NOTIF_TRIGGERED_ID);
-        nm.notify(RetroTimer.NOTIF_TRIGGERED_ID, n);
+        nm.notify(RetroTimer.NOTIF_TRIGGERED_ID, mBuilder.build());
     }
 
     /**

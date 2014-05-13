@@ -30,6 +30,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.preference.PreferenceManager;
+import android.support.v4.app.NotificationCompat;
 import android.text.format.DateFormat;
 
 /**
@@ -77,11 +78,11 @@ public class RetroTimer extends Application {
     public static final String PREF_HAVE_SHOWN_LICENSE = "prefs.have_shown_license";
 
     /** Notification ID for messages about pending alarms */
-    public static final int NOTIF_SET_ID = 0;
+    public static final int NOTIF_SET_ID = 1;
     /**
      * Notification ID for messages about triggering or triggered alarms
      */
-    public static final int NOTIF_TRIGGERED_ID = 1;
+    public static final int NOTIF_TRIGGERED_ID = 2;
 
     /**
      * Initializes the app state, and initializes the AlarmManager if any alarms
@@ -155,13 +156,16 @@ public class RetroTimer extends Application {
         PendingIntent pendingNotify = PendingIntent.getActivity(context, 0,
                 viewAlarm, 0);
 
-        String label = context.getString(R.string.notify_set_label);
-        Notification n = new Notification(R.drawable.ic_stat_alarm_set, label,
-                0);
-        n.setLatestEventInfo(context, label, context.getString(
-                R.string.notify_set_text, DateFormat.getTimeFormat(context)
-                        .format(alarmTime)), pendingNotify);
-        n.flags |= Notification.FLAG_ONGOING_EVENT | Notification.FLAG_NO_CLEAR;
+        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(
+                context)
+                .setContentIntent(pendingNotify)
+                .setDefaults(Notification.DEFAULT_LIGHTS)
+                .setOngoing(true)
+                .setSmallIcon(R.drawable.ic_stat_alarm_set)
+                .setContentTitle(context.getString(R.string.notify_set_label))
+                .setContentText(
+                        context.getString(R.string.notify_set_text, DateFormat
+                                .getTimeFormat(context).format(alarmTime)));
 
         /*
          * Send the notification using the alarm id to easily identify the
@@ -169,7 +173,7 @@ public class RetroTimer extends Application {
          */
         NotificationManager nm = (NotificationManager) context
                 .getSystemService(Context.NOTIFICATION_SERVICE);
-        nm.notify(RetroTimer.NOTIF_SET_ID, n);
+        nm.notify(RetroTimer.NOTIF_SET_ID, mBuilder.build());
     }
 
     /**
