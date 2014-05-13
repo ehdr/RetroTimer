@@ -19,6 +19,7 @@
 
 package se.erichansander.retrotimer;
 
+import android.annotation.TargetApi;
 import android.app.AlarmManager;
 import android.app.Application;
 import android.app.Notification;
@@ -27,6 +28,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.preference.PreferenceManager;
 import android.text.format.DateFormat;
 
@@ -145,7 +147,7 @@ public class RetroTimer extends Application {
         PendingIntent sender = PendingIntent.getBroadcast(context, 0, intent,
                 PendingIntent.FLAG_CANCEL_CURRENT);
 
-        am.set(AlarmManager.RTC_WAKEUP, alarmTime, sender);
+        setAlarmManagerAlarm(am, alarmTime, sender);
 
         // Trigger a notification that, when clicked, will open TimerSet
         Intent viewAlarm = new Intent(context, TimerSet.class);
@@ -168,6 +170,22 @@ public class RetroTimer extends Application {
         NotificationManager nm = (NotificationManager) context
                 .getSystemService(Context.NOTIFICATION_SERVICE);
         nm.notify(RetroTimer.NOTIF_SET_ID, n);
+    }
+
+    /**
+     * Activate alarm in AlarmManager, taking Android version into account
+     * 
+     * Since the API for activating the alarm changed in Kitkat, we need to
+     * treat the two versions differently.
+     */
+    @TargetApi(Build.VERSION_CODES.KITKAT)
+    private static void setAlarmManagerAlarm(AlarmManager am, long alarmTime,
+            PendingIntent sender) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
+            am.set(AlarmManager.RTC_WAKEUP, alarmTime, sender);
+        } else {
+            am.setExact(AlarmManager.RTC_WAKEUP, alarmTime, sender);
+        }
     }
 
     /** Cancels the alarm in the AlarmManager and updates app state */
