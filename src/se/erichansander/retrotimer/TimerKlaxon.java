@@ -38,6 +38,9 @@ package se.erichansander.retrotimer;
 
 import java.lang.ref.WeakReference;
 
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -52,12 +55,18 @@ import android.os.IBinder;
 import android.os.Message;
 import android.os.Vibrator;
 import android.preference.PreferenceManager;
+import android.support.v4.app.NotificationCompat;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
+import android.text.format.DateFormat;
 
 /**
  * Plays alarm and vibrates. Runs as a service so that it can continue to play
  * if another activity overrides the TimerAlert view.
+ * 
+ * It will play alarm and start vibrating, show a notification that allows
+ * dismissing the alarm, and start the TimerAlert activity, that also allows
+ * dismissing.
  * 
  * Receives the ALARM_PLAY_ACTION intent when started.
  */
@@ -99,7 +108,7 @@ public class TimerKlaxon extends Service {
             switch (msg.what) {
             case TIMEOUT_ID:
                 if (k != null) {
-                    k.broadcastSilenceAlarmIntent(k.mAlarmTime);
+                    k.handleAlarmSilence(k.mAlarmTime);
                     k.stopSelf();
                 }
                 break;
@@ -120,7 +129,7 @@ public class TimerKlaxon extends Service {
              */
             if (state != TelephonyManager.CALL_STATE_IDLE
                     && state != mInitialCallState) {
-                broadcastSilenceAlarmIntent(mAlarmTime);
+                handleAlarmSilence(mAlarmTime);
                 stopSelf();
             }
         }
@@ -142,7 +151,11 @@ public class TimerKlaxon extends Service {
     @Override
     public void onDestroy() {
         stop();
-        // Stop listening for incoming calls.
+
+        // Cancel the notification
+        NotificationManager nm = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        nm.cancel(RetroTimer.NOTIF_TRIGGERED_ID);
+
         mTelephonyManager.listen(mPhoneStateListener, 0);
         WakeLockHolder.releaseCpuLock();
     }
@@ -173,6 +186,39 @@ public class TimerKlaxon extends Service {
                 RetroTimer.PREF_ALARM_TIMEOUT_MILLIS, 10 * 1000);
         mAlarmTime = intent.getLongExtra(RetroTimer.ALARM_TIME_EXTRA, 0);
 
+        // Close dialogs and window shade
+        sendBroadcast(new Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS));
+
+        // Trigger a notification that, when clicked, will dismiss the alarm.
+        Intent notify = new Intent(RetroTimer.ALARM_DISMISS_ACTION);
+        PendingIntent pendingNotify = PendingIntent.getBroadcast(this, 0,
+                notify, 0);
+
+        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(
+                this).setContentIntent(pendingNotify)
+                .setDefaults(Notification.DEFAULT_LIGHTS).setOngoing(true)
+                .setSmallIcon(R.drawable.ic_stat_alarm_triggered)
+                .setContentTitle(getString(R.string.notify_triggered_label))
+                .setContentText(getString(R.string.notify_triggered_text));
+
+        /*
+         * Send the notification using the alarm id to easily identify the
+         * correct notification.
+         */
+        NotificationManager nm = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        nm.cancel(RetroTimer.NOTIF_SET_ID);
+        nm.notify(RetroTimer.NOTIF_TRIGGERED_ID, mBuilder.build());
+
+        /*
+         * launch UI, explicitly stating that this is not due to user action so
+         * that the current app's notification management is not disturbed
+         */
+        Intent timerAlert = new Intent(this, TimerAlert.class);
+        timerAlert.putExtra(RetroTimer.ALARM_TIME_EXTRA, mAlarmTime);
+        timerAlert.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
+                | Intent.FLAG_ACTIVITY_NO_USER_ACTION);
+        startActivity(timerAlert);
+
         play(ring, vibrate);
         startTimeoutCountdown(timeoutMillis);
 
@@ -180,13 +226,50 @@ public class TimerKlaxon extends Service {
         // newest state.
         mInitialCallState = mTelephonyManager.getCallState();
 
+        // Update the shared state
+        RetroTimer.clearAlarm(this);
+
         return START_STICKY;
     }
 
-    private void broadcastSilenceAlarmIntent(long alarmTime) {
+    /**
+     * Wrap up after the alarm sound has timed out, with no user dismissal
+     * 
+     * Will stop playing alarm, stop vibrating and display a notification saying
+     * when the alarm triggered.
+     */
+    private void handleAlarmSilence(long alarmTime) {
+        // Display notification
+        NotificationManager nm = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+        // Launch the TimerSet activity when clicked
+        Intent viewAlarm = new Intent(this, TimerSet.class);
+        viewAlarm.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        PendingIntent pintent = PendingIntent
+                .getActivity(this, 0, viewAlarm, 0);
+
+        // Update the notification to indicate that the alert has been
+        // silenced.
+        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(
+                this)
+                .setContentIntent(pintent)
+                .setAutoCancel(true)
+                .setSmallIcon(R.drawable.ic_stat_alarm_triggered)
+                .setContentTitle(getString(R.string.notify_silenced_label))
+                .setContentText(
+                        getString(R.string.notify_silenced_text, DateFormat
+                                .getTimeFormat(this).format(mAlarmTime)));
+        // We have to cancel the original notification since it is in the
+        // ongoing section and we want the "killed" notification to be a plain
+        // notification.
+        nm.cancel(RetroTimer.NOTIF_TRIGGERED_ID);
+        nm.notify(RetroTimer.NOTIF_SILENCED_ID, mBuilder.build());
+
         Intent intent = new Intent(RetroTimer.ALARM_SILENCE_ACTION);
         intent.putExtra(RetroTimer.ALARM_TIME_EXTRA, alarmTime);
         sendBroadcast(intent);
+
+        stopSelf();
     }
 
     private void play(boolean ring, boolean vibrate) {

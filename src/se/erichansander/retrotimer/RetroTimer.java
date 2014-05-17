@@ -83,6 +83,10 @@ public class RetroTimer extends Application {
      * Notification ID for messages about triggering or triggered alarms
      */
     public static final int NOTIF_TRIGGERED_ID = 2;
+    /**
+     * Notification ID for messages about automatically silenced alarms
+     */
+    public static final int NOTIF_SILENCED_ID = 3;
 
     /**
      * Initializes the app state, and initializes the AlarmManager if any alarms
