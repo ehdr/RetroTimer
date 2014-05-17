@@ -36,6 +36,8 @@
 
 package se.erichansander.retrotimer;
 
+import java.lang.ref.WeakReference;
+
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -82,17 +84,30 @@ public class TimerKlaxon extends Service {
 
     // Internal messages. Handles alarm timeouts.
     private static final int TIMEOUT_ID = 1000;
-    private Handler mHandler = new Handler() {
+
+    private static class TimeoutHandler extends Handler {
+        private final WeakReference<TimerKlaxon> mKlaxonRef;
+
+        public TimeoutHandler(TimerKlaxon klaxon) {
+            mKlaxonRef = new WeakReference<TimerKlaxon>(klaxon);
+        }
+
         @Override
         public void handleMessage(Message msg) {
+            TimerKlaxon k = mKlaxonRef.get();
+
             switch (msg.what) {
             case TIMEOUT_ID:
-                broadcastSilenceAlarmIntent(mAlarmTime);
-                stopSelf();
+                if (k != null) {
+                    k.broadcastSilenceAlarmIntent(k.mAlarmTime);
+                    k.stopSelf();
+                }
                 break;
             }
         }
     };
+
+    private Handler mHandler = new TimeoutHandler(this);
 
     private PhoneStateListener mPhoneStateListener = new PhoneStateListener() {
         @Override
