@@ -52,21 +52,22 @@ class WakeLockHolder {
 
     private static PowerManager.WakeLock sCpuWakeLock;
 
-    static void acquireCpuWakeLock(Context context) {
+    public static void acquireScreenCpuWakeLock(Context context) {
+        // this check basically ensures no nesting of WakeLocks, even though
+        // setReferenceCounted() is left at default true.
         if (sCpuWakeLock != null) {
             return;
         }
 
         PowerManager pm = (PowerManager) context
                 .getSystemService(Context.POWER_SERVICE);
-
-        sCpuWakeLock = pm.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK
+        sCpuWakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK
                 | PowerManager.ACQUIRE_CAUSES_WAKEUP
                 | PowerManager.ON_AFTER_RELEASE, TAG);
         sCpuWakeLock.acquire();
     }
 
-    static void releaseCpuLock() {
+    public static void releaseCpuLock() {
         if (sCpuWakeLock != null) {
             sCpuWakeLock.release();
             sCpuWakeLock = null;

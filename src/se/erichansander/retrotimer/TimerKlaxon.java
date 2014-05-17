@@ -121,7 +121,7 @@ public class TimerKlaxon extends Service {
         mTelephonyManager.listen(mPhoneStateListener,
                 PhoneStateListener.LISTEN_CALL_STATE);
 
-        WakeLockHolder.acquireCpuWakeLock(this);
+        WakeLockHolder.acquireScreenCpuWakeLock(this);
     }
 
     @Override

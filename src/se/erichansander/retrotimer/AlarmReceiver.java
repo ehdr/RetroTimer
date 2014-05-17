@@ -98,7 +98,7 @@ public class AlarmReceiver extends BroadcastReceiver {
          * Maintain a cpu wake lock until the AlarmAlert and AlarmKlaxon can
          * pick it up.
          */
-        WakeLockHolder.acquireCpuWakeLock(context);
+        WakeLockHolder.acquireScreenCpuWakeLock(context);
 
         /* Close dialogs and window shade */
         context.sendBroadcast(new Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS));
