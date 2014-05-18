@@ -5,6 +5,7 @@
 
     <!-- Activity labels -->
     <string name="timer_alert_label">Retro Timer alert</string>
+    <string name="timer_settings_label">Retro Timer settings</string>
 
     <!-- Notification texts -->
     <string name="notify_set_label">Retro Timer is set</string>
@@ -18,16 +19,15 @@
     <string name="touch_to_dismiss">Touch to dismiss</string>
 
     <!-- Menu labels -->
-    <string name="ring_on_alarm_turn_on">Ring!</string>
-    <string name="ring_on_alarm_turn_off">Don\'t ring</string>
-    <string name="vibrate_on_alarm_turn_on">Vibrate!</string>
-    <string name="vibrate_on_alarm_turn_off">Don\'t vibrate</string>
+    <string name="menu_settings">Settings</string>
 
-    <!-- Toast texts -->
-    <string name="ring_on_alarm_turned_on">Will now ring on alarm</string>
-    <string name="ring_on_alarm_turned_off">Will now not ring on alarm</string>
-    <string name="vibrate_on_alarm_turned_on">Will now vibrate on alarm</string>
-    <string name="vibrate_on_alarm_turned_off">Will now not vibrate on alarm</string>
+    <!-- Preferences labels -->
+    <string name="pref_ring_on_alarm_title">Ring</string>
+    <string name="pref_ring_on_alarm_summary">Ring when alarm goes off</string>
+    <string name="pref_vibrate_on_alarm_title">Vibrate</string>
+    <string name="pref_vibrate_on_alarm_summary">Vibrate when alarm goes off</string>
+    <string name="pref_go_to_volume_settings_title">Volume</string>
+    <string name="pref_go_to_volume_settings_summary">Go to system settings to change main Alarm volume (also called Ringer volume)</string>
 
     <!-- License notice -->
     <string name="license_notice_title">License notice</string>

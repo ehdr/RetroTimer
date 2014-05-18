@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <!-- The key string is defined in RetroTimer.PREF_RING_ON_ALARM -->
+    <CheckBoxPreference
+        android:defaultValue="true"
+        android:key="prefs.ring_on_alarm"
+        android:summary="@string/pref_ring_on_alarm_summary"
+        android:title="@string/pref_ring_on_alarm_title" />
+    <!-- The key string is defined in RetroTimer.PREF_VIBRATE_ON_ALARM -->
+    <CheckBoxPreference
+        android:defaultValue="true"
+        android:key="prefs.vibrate_on_alarm"
+        android:summary="@string/pref_vibrate_on_alarm_summary"
+        android:title="@string/pref_vibrate_on_alarm_title" />
+
+    <Preference
+        android:summary="@string/pref_go_to_volume_settings_summary"
+        android:title="@string/pref_go_to_volume_settings_title" >
+        <intent android:action="android.settings.SETTINGS" />
+    </Preference>
+
+</PreferenceScreen>

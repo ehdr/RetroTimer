@@ -36,6 +36,10 @@
             android:launchMode="singleInstance"
             android:screenOrientation="portrait" >
         </activity>
+        <activity
+            android:name=".TimerSettings"
+            android:label="@string/timer_settings_label" >
+        </activity>
 
         <receiver
             android:name=".AlarmReceiver"

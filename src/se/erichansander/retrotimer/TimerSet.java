@@ -34,7 +34,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Toast;
 
 /** Main activity for setting the timer */
 public class TimerSet extends Activity implements TimerSetListener {
@@ -93,6 +92,8 @@ public class TimerSet extends Activity implements TimerSetListener {
 
         mVibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
         mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+
+        PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
 
         RetroTimer.initAlarm(this);
 
@@ -190,85 +191,15 @@ public class TimerSet extends Activity implements TimerSetListener {
         return true;
     }
 
-    /**
-     * Sets the correct titles in the options menu, depending on the current
-     * values of PREF_RING_ON_ALARM and PREF_VIBRATE_ON_ALARM.
-     */
-    @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
-        MenuItem item;
-
-        item = menu.findItem(R.id.ring_on_alarm);
-        if (mPrefs.getBoolean(RetroTimer.PREF_RING_ON_ALARM, true)) {
-            item.setTitle(R.string.ring_on_alarm_turn_off);
-        } else {
-            item.setTitle(R.string.ring_on_alarm_turn_on);
-        }
-
-        item = menu.findItem(R.id.vibrate_on_alarm);
-        if (mPrefs.getBoolean(RetroTimer.PREF_VIBRATE_ON_ALARM, true)) {
-            item.setTitle(R.string.vibrate_on_alarm_turn_off);
-        } else {
-            item.setTitle(R.string.vibrate_on_alarm_turn_on);
-        }
-
-        return true;
-    }
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-        case R.id.ring_on_alarm:
-            toggleRingOnAlarm();
-            return true;
-
-        case R.id.vibrate_on_alarm:
-            toggleVibrateOnAlarm();
+        case R.id.show_settings:
+            startActivity(new Intent(this, TimerSettings.class));
             return true;
 
         default:
             return super.onOptionsItemSelected(item);
-        }
-    }
-
-    private void toggleRingOnAlarm() {
-        SharedPreferences.Editor ed = mPrefs.edit();
-        boolean tmp = mPrefs.getBoolean(RetroTimer.PREF_RING_ON_ALARM, true);
-
-        ed.putBoolean(RetroTimer.PREF_RING_ON_ALARM, !tmp);
-        ed.commit();
-
-        if (mPrefs.getBoolean(RetroTimer.PREF_RING_ON_ALARM, true)) {
-            Toast.makeText(this,
-                    getResources().getString(R.string.ring_on_alarm_turned_on),
-                    Toast.LENGTH_SHORT).show();
-        } else {
-            Toast.makeText(
-                    this,
-                    getResources().getString(R.string.ring_on_alarm_turned_off),
-                    Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    private void toggleVibrateOnAlarm() {
-        SharedPreferences.Editor ed = mPrefs.edit();
-        boolean tmp = mPrefs.getBoolean(RetroTimer.PREF_VIBRATE_ON_ALARM, true);
-
-        ed.putBoolean(RetroTimer.PREF_VIBRATE_ON_ALARM, !tmp);
-        ed.commit();
-
-        if (mPrefs.getBoolean(RetroTimer.PREF_VIBRATE_ON_ALARM, true)) {
-            Toast.makeText(
-                    this,
-                    getResources().getString(
-                            R.string.vibrate_on_alarm_turned_on),
-                    Toast.LENGTH_SHORT).show();
-        } else {
-            Toast.makeText(
-                    this,
-                    getResources().getString(
-                            R.string.vibrate_on_alarm_turned_off),
-                    Toast.LENGTH_SHORT).show();
         }
     }
 

@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
 
-    <item android:id="@+id/ring_on_alarm"/>
-    <item android:id="@+id/vibrate_on_alarm"/>
+    <item
+        android:id="@+id/show_settings"
+        android:showAsAction="ifRoom"
+        android:title="@string/menu_settings"/>
 
 </menu>
