@@ -86,6 +86,7 @@ public class TimerKlaxon extends Service {
     private Vibrator mVibrator;
     private MediaPlayer mMediaPlayer;
     private TelephonyManager mTelephonyManager;
+    private AudioFocusHelper mAudioFocusHelper;
 
     private boolean mPlaying = false;
     private long mAlarmTime = 0;
@@ -144,6 +145,12 @@ public class TimerKlaxon extends Service {
         mTelephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
         mTelephonyManager.listen(mPhoneStateListener,
                 PhoneStateListener.LISTEN_CALL_STATE);
+
+        if (android.os.Build.VERSION.SDK_INT >= 8) {
+            mAudioFocusHelper = new AudioFocusHelper(this);
+        } else {
+            mAudioFocusHelper = null;
+        }
 
         WakeLockHolder.acquireScreenCpuWakeLock(this);
     }
@@ -329,6 +336,9 @@ public class TimerKlaxon extends Service {
             player.setAudioStreamType(AudioManager.STREAM_ALARM);
             player.setLooping(true);
             player.prepare();
+            if (mAudioFocusHelper != null) {
+                mAudioFocusHelper.requestFocus();
+            }
             player.start();
         }
     }
@@ -353,6 +363,9 @@ public class TimerKlaxon extends Service {
             // Stop audio playing
             if (mMediaPlayer != null) {
                 mMediaPlayer.stop();
+                if (mAudioFocusHelper != null) {
+                    mAudioFocusHelper.abandonFocus();
+                }
                 mMediaPlayer.release();
                 mMediaPlayer = null;
             }
