@@ -20,6 +20,7 @@
 package se.erichansander.retrotimer;
 
 import se.erichansander.retrotimer.TimerAlertView.TimerAlertListener;
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -54,17 +55,7 @@ public class TimerAlert extends Activity implements TimerAlertListener {
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
 
-        /*
-         * Some preparations for handling the situation when the alarm triggers
-         * while the phone is locked.
-         */
-        final Window win = getWindow();
-        win.addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
-                | WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
-        // Turn on the screen
-        win.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
-                | WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
-                | WindowManager.LayoutParams.FLAG_ALLOW_LOCK_WHILE_SCREEN_ON);
+        setToShowOverLockScreen(getWindow());
 
         setContentView(R.layout.timer_alert);
 
@@ -75,6 +66,22 @@ public class TimerAlert extends Activity implements TimerAlertListener {
         filter.addAction(RetroTimer.ALARM_DISMISS_ACTION);
         filter.addAction(RetroTimer.ALARM_SILENCE_ACTION);
         registerReceiver(mReceiver, filter);
+    }
+
+    /*
+     * Show the activity over the lock screen when the alarm triggers while the
+     * phone is locked.
+     * 
+     * Some of these parameters where introduced with API level 5 and 8, but
+     * cause no harm on earlier versions.
+     */
+    @TargetApi(8)
+    private void setToShowOverLockScreen(Window win) {
+        win.addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
+                | WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
+        win.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
+                | WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
+                | WindowManager.LayoutParams.FLAG_ALLOW_LOCK_WHILE_SCREEN_ON);
     }
 
     @Override
