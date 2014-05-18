@@ -19,7 +19,6 @@
 
 package se.erichansander.retrotimer;
 
-import android.annotation.TargetApi;
 import android.app.AlarmManager;
 import android.app.Application;
 import android.app.Notification;
@@ -144,15 +143,29 @@ public class RetroTimer extends Application {
         ed.putBoolean(RetroTimer.PREF_ALARM_SET, true);
         ed.commit();
 
-        AlarmManager am = (AlarmManager) context
-                .getSystemService(Context.ALARM_SERVICE);
-
         Intent intent = new Intent(RetroTimer.ALARM_TRIGGER_ACTION);
         intent.putExtra(RetroTimer.ALARM_TIME_EXTRA, alarmTime);
         PendingIntent sender = PendingIntent.getBroadcast(context, 0, intent,
                 PendingIntent.FLAG_CANCEL_CURRENT);
 
-        setAlarmManagerAlarm(am, alarmTime, sender);
+        /*
+         * Activate alarm in AlarmManager. Since the API for activating the
+         * alarm changed in KitKat, we need to treat the two versions
+         * differently, and since "Dalvik in Android 1.x was very conservative
+         * and would crash if you try to load a class that contains a reference
+         * that it cannot resolve" we have to put it in a separate class...
+         * 
+         * See
+         * http://stackoverflow.com/questions/13444255/could-not-find-method-
+         * from-the-newer-api-with-using-targetapi-annotation
+         */
+        AlarmManager am = (AlarmManager) context
+                .getSystemService(Context.ALARM_SERVICE);
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
+            am.set(AlarmManager.RTC_WAKEUP, alarmTime, sender);
+        } else {
+            AlarmManagerKitKat.set(am, alarmTime, sender);
+        }
 
         // Trigger a notification that, when clicked, will open TimerSet
         Intent viewAlarm = new Intent(context, TimerSet.class);
@@ -178,22 +191,6 @@ public class RetroTimer extends Application {
         NotificationManager nm = (NotificationManager) context
                 .getSystemService(Context.NOTIFICATION_SERVICE);
         nm.notify(RetroTimer.NOTIF_SET_ID, mBuilder.build());
-    }
-
-    /**
-     * Activate alarm in AlarmManager, taking Android version into account
-     * 
-     * Since the API for activating the alarm changed in Kitkat, we need to
-     * treat the two versions differently.
-     */
-    @TargetApi(Build.VERSION_CODES.KITKAT)
-    private static void setAlarmManagerAlarm(AlarmManager am, long alarmTime,
-            PendingIntent sender) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
-            am.set(AlarmManager.RTC_WAKEUP, alarmTime, sender);
-        } else {
-            am.setExact(AlarmManager.RTC_WAKEUP, alarmTime, sender);
-        }
     }
 
     /** Cancels the alarm in the AlarmManager and updates app state */
