@@ -287,9 +287,7 @@ public class TimerKlaxon extends Service {
             mMediaPlayer = new MediaPlayer();
             mMediaPlayer.setOnErrorListener(new OnErrorListener() {
                 public boolean onError(MediaPlayer mp, int what, int extra) {
-                    mp.stop();
-                    mp.release();
-                    mMediaPlayer = null;
+                    stop();
                     return true;
                 }
             });
