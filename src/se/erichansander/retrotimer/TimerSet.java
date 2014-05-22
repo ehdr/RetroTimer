@@ -22,7 +22,6 @@ package se.erichansander.retrotimer;
 import se.erichansander.retrotimer.TimerSetView.TimerSetListener;
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -37,9 +36,6 @@ import android.view.View;
 
 /** Main activity for setting the timer */
 public class TimerSet extends Activity implements TimerSetListener {
-
-    // Identifier for the dialog displaying the license notice
-    private static final int DIALOG_LICENSE_ID = 1;
 
     // Interval between redraws of the timer to update time left
     private static final int UPDATE_INTERVAL_MILLIS = 60 * 1000;
@@ -141,7 +137,7 @@ public class TimerSet extends Activity implements TimerSetListener {
 
         /* Only show the license notice if we haven't already */
         if (!mPrefs.getBoolean(RetroTimer.PREF_HAVE_SHOWN_LICENSE, false)) {
-            showDialog(DIALOG_LICENSE_ID);
+            showLicenseDialog();
 
             // remember that we have showed the license
             SharedPreferences.Editor ed = mPrefs.edit();
@@ -161,27 +157,13 @@ public class TimerSet extends Activity implements TimerSetListener {
         mHandler.removeCallbacks(runTimeUpdate);
     }
 
-    @Override
-    protected Dialog onCreateDialog(int id) {
-        Dialog dialog;
-
-        switch (id) {
-        /* Display a dialog showing the license notice */
-        case DIALOG_LICENSE_ID:
-            // use a custom View to get clickable links in the dialog
-            View view = View.inflate(this, R.layout.license_notice, null);
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle(R.string.license_notice_title).setView(view)
-                    .setCancelable(false)
-                    .setPositiveButton(R.string.license_notice_button, null);
-            dialog = builder.create();
-            break;
-
-        default:
-            return null;
-        }
-
-        return dialog;
+    private void showLicenseDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(R.string.license_notice_title)
+                .setView(View.inflate(this, R.layout.license_notice, null))
+                .setCancelable(false)
+                .setPositiveButton(R.string.license_notice_button, null);
+        builder.create().show();
     }
 
     @Override
