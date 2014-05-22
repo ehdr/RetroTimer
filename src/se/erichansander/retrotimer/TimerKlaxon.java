@@ -158,6 +158,7 @@ public class TimerKlaxon extends Service {
     @Override
     public void onDestroy() {
         stop();
+        cancelTimeoutCountdown();
 
         // Cancel the notification
         NotificationManager nm = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
@@ -352,7 +353,7 @@ public class TimerKlaxon extends Service {
     }
 
     /**
-     * Stops alarm audio and disables alarm
+     * Stops alarm audio and vibration
      */
     public void stop() {
         if (mPlaying) {
@@ -371,7 +372,6 @@ public class TimerKlaxon extends Service {
             // Stop vibrator
             mVibrator.cancel();
         }
-        cancelTimeoutCountdown();
     }
 
     /**

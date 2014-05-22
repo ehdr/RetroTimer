@@ -103,6 +103,8 @@ public class TimerSet extends Activity implements TimerSetListener {
     protected void onStart() {
         super.onStart();
 
+        crashIfMissedAlarm(this);
+
         if (RetroTimer.getMillisLeftToAlarm(this) > 0) {
             startUpdatingTimeLeft();
         } else {
@@ -213,8 +215,27 @@ public class TimerSet extends Activity implements TimerSetListener {
         updateTimeLeft();
     }
 
+    /**
+     * Will throw a RuntimeException if time left to alarm is negative
+     */
+    private void crashIfMissedAlarm(Context c) {
+        if (RetroTimer.getMillisLeftToAlarm(c) < 0) {
+            /*
+             * Should never happen - something has gone very wrong (some process
+             * killed by task killer? some unknown race condition?
+             */
+            RetroTimer.handleFatalError(c);
+
+            throw new RuntimeException(
+                    "alarm never triggered (getMillisLeftToAlarm is negative)");
+        }
+    }
+
     private void updateTimeLeft() {
         long millisLeft = RetroTimer.getMillisLeftToAlarm(this);
+
+        crashIfMissedAlarm(this);
+
         updateTimeLeft(millisLeft);
     }
 

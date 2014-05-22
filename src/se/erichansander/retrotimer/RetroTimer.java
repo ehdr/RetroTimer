@@ -252,4 +252,14 @@ public class RetroTimer extends Application {
             return 0;
         }
     }
+
+    /**
+     * Try to return the app to its initial state
+     */
+    public static void handleFatalError(Context context) {
+        Intent intent = new Intent(RetroTimer.ALARM_DISMISS_ACTION);
+        context.sendBroadcast(intent);
+
+        cancelAlarm(context);
+    }
 }
