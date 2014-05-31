@@ -3,5 +3,6 @@
 
     <color name="timer_scale">#CC0000</color>
     <color name="background">#555555</color>
+    <color name="volume_zero_warning_background">#32FFFFFF</color>
 
 </resources>

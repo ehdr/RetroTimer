@@ -17,6 +17,7 @@
 
     <!-- Labels -->
     <string name="touch_to_dismiss">Touch to dismiss</string>
+    <string name="volume_zero_warning">Note: Ringing is enabled, but the alarm volume is zero, so it will be silent! Go to settings to change this&#8230;</string>
 
     <!-- Menu labels -->
     <string name="menu_settings">Settings</string>

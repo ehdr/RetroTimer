@@ -25,6 +25,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Vibrator;
@@ -33,6 +34,8 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.TextView;
 
 /** Main activity for setting the timer */
 public class TimerSet extends Activity implements TimerSetListener {
@@ -50,6 +53,7 @@ public class TimerSet extends Activity implements TimerSetListener {
     private SharedPreferences mPrefs;
     private Vibrator mVibrator;
     private TimerSetView mTimer;
+    private TextView mVolumeZeroWarning;
 
     // True when the user has interacted with the app since the activity was
     // resumed
@@ -97,6 +101,13 @@ public class TimerSet extends Activity implements TimerSetListener {
 
         mTimer = (TimerSetView) findViewById(R.id.timer_set_view);
         mTimer.setTimerSetListener(this);
+
+        mVolumeZeroWarning = (TextView) findViewById(R.id.volume_zero_warning);
+        mVolumeZeroWarning.setOnClickListener(new OnClickListener() {
+            public void onClick(View v) {
+                startActivity(new Intent(TimerSet.this, TimerSettings.class));
+            }
+        });
     }
 
     @Override
@@ -145,6 +156,15 @@ public class TimerSet extends Activity implements TimerSetListener {
             SharedPreferences.Editor ed = mPrefs.edit();
             ed.putBoolean(RetroTimer.PREF_HAVE_SHOWN_LICENSE, true);
             ed.commit();
+        }
+
+        // Display warning of ringing is on but alarm volume is zero
+        boolean ring = mPrefs.getBoolean(RetroTimer.PREF_RING_ON_ALARM, true);
+        final AudioManager am = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+        if (ring && am.getStreamVolume(AudioManager.STREAM_ALARM) == 0) {
+            mVolumeZeroWarning.setVisibility(TextView.VISIBLE);
+        } else {
+            mVolumeZeroWarning.setVisibility(TextView.INVISIBLE);
         }
 
         // Update the time remaining to alarm

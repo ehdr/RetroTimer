@@ -14,4 +14,19 @@
         android:src="@drawable/timer" >
     </se.erichansander.retrotimer.TimerSetView>
 
+    <TextView
+        android:id="@+id/volume_zero_warning"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:background="@color/volume_zero_warning_background"
+        android:paddingBottom="4sp"
+        android:paddingLeft="8sp"
+        android:paddingRight="8sp"
+        android:paddingTop="4sp"
+        android:text="@string/volume_zero_warning"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:visibility="invisible" />
+
 </RelativeLayout>
