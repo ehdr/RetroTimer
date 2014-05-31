@@ -129,7 +129,12 @@ public class RetroTimer extends Application {
                 15000 + millisLeft / 60);
         ed.commit();
 
-        setAlarmAt(context, System.currentTimeMillis() + millisLeft);
+        long now = System.currentTimeMillis();
+        setAlarmAt(context, now + millisLeft);
+
+        TinyTracelog.init(context);
+        TinyTracelog.clear();
+        TinyTracelog.trace("1 " + now + "," + (millisLeft / 60000));
     }
 
     /**

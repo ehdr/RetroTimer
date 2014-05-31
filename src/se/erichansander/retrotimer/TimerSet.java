@@ -246,8 +246,10 @@ public class TimerSet extends Activity implements TimerSetListener {
              */
             RetroTimer.handleFatalError(c);
 
+            TinyTracelog.trace("e1 " + System.currentTimeMillis());
             throw new RuntimeException(
-                    "alarm never triggered (getMillisLeftToAlarm is negative)");
+                    "alarm never triggered (getMillisLeftToAlarm is negative)\n"
+                            + TinyTracelog.getTracelog());
         }
     }
 

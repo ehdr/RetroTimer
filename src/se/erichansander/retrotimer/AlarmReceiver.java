@@ -61,13 +61,19 @@ public class AlarmReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         long alarmTime = intent.getLongExtra(RetroTimer.ALARM_TIME_EXTRA, 0);
 
+        TinyTracelog.init(context);
+
         if (Intent.ACTION_BOOT_COMPLETED.equals(intent.getAction())) {
+            TinyTracelog.trace("2.1");
             RetroTimer.initAlarm(context);
         } else if (RetroTimer.ALARM_TRIGGER_ACTION.equals(intent.getAction())) {
+            TinyTracelog.trace("2.2 " + System.currentTimeMillis());
             handleAlarmTrigger(context, alarmTime);
         } else if (RetroTimer.ALARM_SILENCE_ACTION.equals(intent.getAction())) {
+            TinyTracelog.trace("7.1");
             // No action needed, since TimerKlaxon already stopped everything
         } else if (RetroTimer.ALARM_DISMISS_ACTION.equals(intent.getAction())) {
+            TinyTracelog.trace("7.2");
             handleAlarmDismiss(context);
         } else {
             // Unknown intent!
@@ -84,6 +90,7 @@ public class AlarmReceiver extends BroadcastReceiver {
         long now = System.currentTimeMillis();
         if (now > alarmTime + STALE_WINDOW * 1000) {
             // Stale alarm. Just ignore it.
+            TinyTracelog.trace("2.2.e");
             return;
         }
 

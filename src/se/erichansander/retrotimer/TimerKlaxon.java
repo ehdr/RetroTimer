@@ -122,6 +122,7 @@ public class TimerKlaxon extends Service {
     private PhoneStateListener mPhoneStateListener = new PhoneStateListener() {
         @Override
         public void onCallStateChanged(int state, String ignored) {
+            TinyTracelog.trace("6");
             /*
              * The user might already be in a call when the alarm fires. When we
              * register onCallStateChanged, we get the initial in-call state
@@ -130,6 +131,7 @@ public class TimerKlaxon extends Service {
              */
             if (state != TelephonyManager.CALL_STATE_IDLE
                     && state != mInitialCallState) {
+                TinyTracelog.trace("6.1");
                 handleAlarmSilence(mAlarmTime);
                 stopSelf();
             }
@@ -138,6 +140,8 @@ public class TimerKlaxon extends Service {
 
     @Override
     public void onCreate() {
+        TinyTracelog.trace("3");
+
         mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
         mVibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
 
@@ -157,6 +161,8 @@ public class TimerKlaxon extends Service {
 
     @Override
     public void onDestroy() {
+        TinyTracelog.trace("9");
+
         stop();
         cancelTimeoutCountdown();
 
@@ -181,8 +187,11 @@ public class TimerKlaxon extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        TinyTracelog.trace("4");
+
         // No intent, tell the system not to restart us.
         if (intent == null) {
+            TinyTracelog.trace("4.e");
             stopSelf();
             return START_NOT_STICKY;
         }
@@ -247,6 +256,8 @@ public class TimerKlaxon extends Service {
      * when the alarm triggered.
      */
     private void handleAlarmSilence(long alarmTime) {
+        TinyTracelog.trace("8");
+
         // Display notification
         NotificationManager nm = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
@@ -281,13 +292,17 @@ public class TimerKlaxon extends Service {
     }
 
     private void play(boolean ring, boolean vibrate) {
+        TinyTracelog.trace("5");
+
         // stop() checks to see if we are already playing.
         stop();
 
         if (ring) {
+            TinyTracelog.trace("5.1");
             mMediaPlayer = new MediaPlayer();
             mMediaPlayer.setOnErrorListener(new OnErrorListener() {
                 public boolean onError(MediaPlayer mp, int what, int extra) {
+                    TinyTracelog.trace("5.1.e1");
                     stop();
                     return true;
                 }
@@ -299,47 +314,51 @@ public class TimerKlaxon extends Service {
                  * resource at a low volume to not disrupt the call.
                  */
                 if (mTelephonyManager.getCallState() != TelephonyManager.CALL_STATE_IDLE) {
+                    TinyTracelog.trace("5.1.1");
                     mMediaPlayer.setVolume(IN_CALL_VOLUME, IN_CALL_VOLUME);
                     setDataSourceFromResource(getResources(), mMediaPlayer,
                             R.raw.in_call_alarm);
                 } else {
+                    TinyTracelog.trace("5.1.2");
                     setDataSourceFromResource(getResources(), mMediaPlayer,
                             R.raw.classic_alarm);
                 }
-                startAlarm(mMediaPlayer);
+            } catch (Exception ex) {
+                // Failed to set data source. Not much we can do to save
+                // the situation though...
+                TinyTracelog.trace("5.1.e2");
+            }
+
+            try {
+                final AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+                // do not play alarms if stream volume is 0
+                int volume = audioManager.getStreamVolume(AudioManager.STREAM_ALARM);
+                TinyTracelog.trace("5.1.3 " + volume);
+                if (volume != 0) {
+                    mMediaPlayer.setAudioStreamType(AudioManager.STREAM_ALARM);
+                    mMediaPlayer.setLooping(true);
+                    mMediaPlayer.prepare();
+                    if (mAudioFocusHelper != null) {
+                        mAudioFocusHelper.requestFocus();
+                    }
+                    mMediaPlayer.start();
+                }
             } catch (Exception ex) {
                 // Failed to play ring tone. Not much we can do to save
                 // the situation though...
+                TinyTracelog.trace("5.1.e3");
             }
         }
 
         /* Start the vibrator after everything is ok with the media player */
         if (vibrate) {
+            TinyTracelog.trace("5.2");
             mVibrator.vibrate(sVibratePattern, 0);
         } else {
             mVibrator.cancel();
         }
 
         mPlaying = true;
-    }
-
-    // Do the common stuff when starting the alarm.
-    private void startAlarm(MediaPlayer player) throws java.io.IOException,
-            IllegalArgumentException, IllegalStateException {
-        final AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-        /*
-         * do not play alarms if stream volume is 0 (typically because ringer
-         * mode is silent).
-         */
-        if (audioManager.getStreamVolume(AudioManager.STREAM_ALARM) != 0) {
-            player.setAudioStreamType(AudioManager.STREAM_ALARM);
-            player.setLooping(true);
-            player.prepare();
-            if (mAudioFocusHelper != null) {
-                mAudioFocusHelper.requestFocus();
-            }
-            player.start();
-        }
     }
 
     private void setDataSourceFromResource(Resources resources,
