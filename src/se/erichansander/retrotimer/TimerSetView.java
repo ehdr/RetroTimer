@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010-2012  Eric Hansander
+ * Copyright (C) 2010-2014  Eric Hansander
  *
  *  This file is part of Retro Timer.
  *

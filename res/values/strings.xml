@@ -52,7 +52,7 @@
     <!-- Title for the license dialog -->
     <string name="license_notice_title">License notice</string>
     <!-- Main text of the license dialog, from the GNU GPL v3 -->
-    <string name="license_notice_text">Copyright © 2010-2012  Eric Hansander\n
+    <string name="license_notice_text">Copyright © 2010-2014  Eric Hansander\n
 \n
   Retro Timer is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
