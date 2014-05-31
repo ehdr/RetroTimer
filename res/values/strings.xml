@@ -1,37 +1,57 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
 
+    <!-- Application name, also used as label for main TimerSet activity -->
     <string name="app_label">Retro Timer</string>
 
     <!-- Activity labels -->
+    <!-- Label for TimerAlert activity -->
     <string name="timer_alert_label">Retro Timer alert</string>
+    <!-- Label for TimerSettings preferences activity -->
     <string name="timer_settings_label">Retro Timer settings</string>
 
     <!-- Notification texts -->
+    <!-- Notification label, for when countdown is ongoing -->
     <string name="notify_set_label">Retro Timer is set</string>
-    <string name="notify_set_text">Alarm set to trigger at %1$s (approximately)</string>
+    <!-- Notification text, for when countdown is ongoing -->
+    <string name="notify_set_text">Alarm set to fire at <xliff:g id="time">%1$s</xliff:g></string>
+    <!-- Notification label, for when alert is firing -->
     <string name="notify_triggered_label">Retro Timer alert</string>
-    <string name="notify_triggered_text">Select to dismiss the alarm</string>
-    <string name="notify_silenced_label">Retro Timer silenced</string>
-    <string name="notify_silenced_text">Alarm triggered at %1$s</string>
+    <!-- Notification text, for when alert is firing -->
+    <string name="notify_triggered_text">Select to dismiss alarm</string>
+    <!-- Notification label, for when alert is silenced (a.k.a. missed) -->
+    <string name="notify_silenced_label">Retro Timer missed alarm</string>
+    <!-- Notification text, for when alert is silenced (a.k.a. missed) -->
+    <string name="notify_silenced_text">Alarm missed at <xliff:g id="time">%1$s</xliff:g></string>
 
     <!-- Labels -->
+    <!-- Label shown over TimerAlert activity -->
     <string name="touch_to_dismiss">Touch to dismiss</string>
-    <string name="volume_zero_warning">Note: Ringing is enabled, but the alarm volume is zero, so it will be silent! Go to settings to change this&#8230;</string>
+    <!-- Label sometimes shown over TimerSet activity -->
+    <string name="volume_zero_warning">Note: Ringing is enabled, but alarm volume is zero so it will be silent! Go to settings to change this&#8230;</string>
 
     <!-- Menu labels -->
+    <!-- Menu item for launching TimerSettings activity -->
     <string name="menu_settings">Settings</string>
 
     <!-- Preferences labels -->
+    <!-- Title for preference to enable ringing on alart -->
     <string name="pref_ring_on_alarm_title">Ring</string>
-    <string name="pref_ring_on_alarm_summary">Ring when alarm goes off</string>
+    <!-- Summary for preference to enable ringing on alart -->
+    <string name="pref_ring_on_alarm_summary">Ring when countdown reaches zero</string>
+    <!-- Title for preference to enable vibrating on alart -->
     <string name="pref_vibrate_on_alarm_title">Vibrate</string>
-    <string name="pref_vibrate_on_alarm_summary">Vibrate when alarm goes off</string>
+    <!-- Summary for preference to enable vibrating on alart -->
+    <string name="pref_vibrate_on_alarm_summary">Vibrate when countdown reaches zero</string>
+    <!-- Title for preference to launch main system settings activity, to change alarm volume -->
     <string name="pref_go_to_volume_settings_title">Volume</string>
-    <string name="pref_go_to_volume_settings_summary">Go to system settings to change main Alarm volume (also called Ringer volume)</string>
+    <!-- Summary for preference to launch main system settings activity, to change alarm volume -->
+    <string name="pref_go_to_volume_settings_summary">Go to system settings to change Alarm volume (a.k.a. Ringer volume)</string>
 
-    <!-- License notice -->
+    <!-- License notice dialog -->
+    <!-- Title for the license dialog -->
     <string name="license_notice_title">License notice</string>
+    <!-- Main text of the license dialog, from the GNU GPL v3 -->
     <string name="license_notice_text">Copyright © 2010-2012  Eric Hansander\n
 \n
   Retro Timer is free software: you can redistribute it and/or modify
@@ -46,6 +66,7 @@
 \n
   You should have received a copy of the GNU General Public License
   along with Retro Timer.  If not, see http://www.gnu.org/licenses/.</string>
+    <!-- Title for the button to close license dialog -->
     <string name="license_notice_button">OK</string>
 
 </resources>
