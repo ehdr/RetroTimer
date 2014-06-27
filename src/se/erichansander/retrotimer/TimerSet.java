@@ -236,17 +236,24 @@ public class TimerSet extends Activity implements TimerSetListener {
     }
 
     /**
-     * Will throw a RuntimeException if time left to alarm is negative
+     * Will throw a RuntimeException if time left to alarm is too negative
      */
     private void crashIfMissedAlarm(Context c) {
-        if (RetroTimer.getMillisLeftToAlarm(c) < 0) {
+        /*
+         * Must leave some wiggle room for the alarm to be delayed for various
+         * reasons, and since the basic resolution of this timer is one minute,
+         * lets crash if the alarm is more than 30 seconds late.
+         */
+        long millisLeft = RetroTimer.getMillisLeftToAlarm(c);
+        if (millisLeft < -(30 * 1000)) {
             /*
              * Should never happen - something has gone very wrong (some process
-             * killed by task killer? some unknown race condition?
+             * killed by task killer? some unknown race condition?)
              */
             RetroTimer.handleFatalError(c);
 
-            TinyTracelog.trace("e1 " + System.currentTimeMillis());
+            TinyTracelog.trace("e1 " + System.currentTimeMillis() + ","
+                    + millisLeft);
             throw new RuntimeException(
                     "alarm never triggered (getMillisLeftToAlarm is negative)\n"
                             + TinyTracelog.getTracelog());
